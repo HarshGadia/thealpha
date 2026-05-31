@@ -1,0 +1,693 @@
+html_content = r"""<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>THE ALPHA | Integrated Intelligence</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+                    "sans": ["Inter", "sans-serif"],
+                    "serif": ["Playfair Display", "serif"],
+                    "mono": ["JetBrains Mono", "monospace"]
+            },
+            colors: {
+                "alpha-orange": "#f97316",
+                "alpha-green": "#059669",
+                "surface-variant": "#f1f5f9",
+                "alpha-cream": "#fdfbf7"
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #f8fafc;
+            color: #0f172a;
+            -webkit-font-smoothing: antialiased;
+        }
+        .ticker-scroll {
+            display: flex;
+            animation: ticker 30s linear infinite;
+        }
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .data-grid-row:nth-child(even) { background-color: #f1f5f9; }
+        
+        /* Hide scrollbar for tabs */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="font-sans text-sm bg-alpha-cream">
+<!-- Top Logo Header -->
+<header class="bg-alpha-cream border-b border-gray-200">
+<div class="flex items-center justify-between py-6 px-8 max-w-[1600px] mx-auto">
+    <div class="flex items-center gap-8">
+        <h1 class="font-serif text-4xl font-bold uppercase tracking-tight text-gray-900">THE ALPHA</h1>
+    </div>
+    <div class="flex items-center gap-4">
+        <button class="material-symbols-outlined text-gray-500 hover:bg-gray-100 p-2 rounded transition-colors">light_mode</button>
+        <button onclick="location.reload()" class="bg-gray-900 text-white px-6 py-2 font-mono text-xs uppercase tracking-widest hover:bg-gray-800 transition-all">Refresh Now</button>
+    </div>
+</div>
+</header>
+
+<!-- Dedicated Tab Bar (from Image 1) -->
+<div class="bg-alpha-cream border-b border-gray-200 sticky top-0 z-50">
+    <div class="max-w-[1600px] mx-auto px-8 overflow-x-auto no-scrollbar">
+        <div id="tab-nav" class="flex items-center gap-8 whitespace-nowrap">
+            <!-- Tabs rendered via JS -->
+        </div>
+    </div>
+</div>
+
+<!-- Global Market Ticker -->
+<div class="bg-surface-variant text-gray-700 py-2 overflow-hidden whitespace-nowrap border-b border-gray-200">
+<div class="ticker-scroll" id="ticker-track">
+<!-- Ticker items rendered via JS -->
+</div>
+</div>
+
+<!-- Main Content Canvas -->
+<main class="max-w-[1600px] mx-auto px-8 py-8">
+<div class="grid grid-cols-12 gap-8">
+<!-- News Feed (Left & Center) -->
+<div class="col-span-12 lg:col-span-9" id="content-area">
+    <!-- Tab content injected here -->
+</div>
+<!-- Integrated Intelligence (Right Rail) -->
+<div class="col-span-12 lg:col-span-3 space-y-8">
+<!-- Market Snapshot -->
+<section class="bg-alpha-cream border border-gray-200 shadow-sm">
+<div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
+<h3 class="font-mono text-[11px] text-gray-600 uppercase font-bold tracking-widest">Market Snapshot</h3>
+<span class="material-symbols-outlined text-gray-400 text-[18px]">show_chart</span>
+</div>
+<div class="space-y-px bg-gray-200">
+<div class="flex justify-between p-3 bg-alpha-cream">
+<span class="font-sans font-medium text-gray-800 text-sm">NIFTY 50</span>
+<div class="text-right">
+  <div id="nifty-val" class="font-mono text-sm font-semibold">23,547.75</div>
+  <div id="nifty-chg" class="font-mono text-[10px] text-red-600">▼ -1.50%</div>
+</div>
+</div>
+<div class="flex justify-between p-3 bg-alpha-cream">
+<span class="font-sans font-medium text-gray-800 text-sm">SENSEX</span>
+<div class="text-right">
+  <div id="sensex-val" class="font-mono text-sm font-semibold">74,775.74</div>
+  <div id="sensex-chg" class="font-mono text-[10px] text-red-600">▼ -1.44%</div>
+</div>
+</div>
+<div class="flex justify-between p-3 bg-alpha-cream">
+<span class="font-sans font-medium text-gray-800 text-sm">INDIA VIX</span>
+<div class="text-right">
+  <div class="font-mono text-sm font-semibold text-red-600">15.20</div>
+  <div class="font-mono text-[10px] text-red-600">▲ +2.34%</div>
+</div>
+</div>
+<div class="flex justify-between p-3 bg-alpha-cream">
+<span class="font-sans font-medium text-gray-800 text-sm">GOLD</span>
+<div class="text-right">
+  <div id="gold-val" class="font-mono text-sm font-semibold">₹1,56,463</div>
+  <div id="gold-chg" class="font-mono text-[10px] text-green-600">▲ +1.47%</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Yield Curve Intelligence -->
+<section class="bg-alpha-cream border border-gray-200 shadow-sm">
+<div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
+<h3 class="font-mono text-[11px] text-gray-600 uppercase font-bold tracking-widest">Yields & Forex</h3>
+<span class="material-symbols-outlined text-gray-400 text-[18px]">trending_up</span>
+</div>
+<div class="grid grid-cols-2 gap-px bg-gray-200">
+<div class="p-3 bg-alpha-cream">
+<p class="font-mono text-[10px] text-gray-500 mb-1">US 10Y</p>
+<p id="us10y-val" class="font-mono text-sm font-semibold">4.45%</p>
+<p id="us10y-chg" class="font-mono text-[10px] text-green-600">▲ +7 bps</p>
+</div>
+<div class="p-3 bg-alpha-cream">
+<p class="font-mono text-[10px] text-gray-500 mb-1">IN 10Y</p>
+<p id="in10y-val" class="font-mono text-sm font-semibold">7.00%</p>
+<p id="in10y-chg" class="font-mono text-[10px] text-red-600">▼ -4 bps</p>
+</div>
+<div class="p-3 bg-alpha-cream">
+<p class="font-mono text-[10px] text-gray-500 mb-1">USD / INR</p>
+<p id="usdinr-val" class="font-mono text-sm font-semibold">₹84.96</p>
+<p id="usdinr-chg" class="font-mono text-[10px] text-green-600">▲ +0.54%</p>
+</div>
+<div class="p-3 bg-alpha-cream">
+<p class="font-mono text-[10px] text-gray-500 mb-1">Spread</p>
+<p id="spread-val" class="font-mono text-sm font-semibold">255 bps</p>
+<p id="spread-chg" class="font-mono text-[10px] text-red-600">▼ -11 bps</p>
+</div>
+</div>
+</section>
+
+<!-- Economic Calendar -->
+<section class="bg-alpha-cream border border-gray-200 shadow-sm">
+<div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
+<h3 class="font-mono text-[11px] text-gray-600 uppercase font-bold tracking-widest">Upcoming Catalysts</h3>
+<span class="material-symbols-outlined text-gray-400 text-[18px]">event</span>
+</div>
+<div class="space-y-px bg-gray-200">
+  <div class="p-4 bg-alpha-cream">
+    <div class="flex justify-between items-center mb-1">
+      <span class="font-mono text-[11px] font-semibold text-gray-800">RBI Monetary Policy</span>
+      <span class="font-mono text-[10px] font-bold text-red-600">Tomorrow</span>
+    </div>
+    <p class="font-sans text-xs text-gray-600 mt-2">Expected rate hold at 6.5%. Watch for stance change.</p>
+  </div>
+  <div class="p-4 bg-alpha-cream">
+    <div class="flex justify-between items-center mb-1">
+      <span class="font-mono text-[11px] font-semibold text-gray-800">US Non-Farm Payrolls</span>
+      <span class="font-mono text-[10px] font-bold text-gray-900">Friday</span>
+    </div>
+    <p class="font-sans text-xs text-gray-600 mt-2">Consensus 180k. Impact on Fed dot plot critical.</p>
+  </div>
+</div>
+</section>
+
+<!-- Sector Momentum -->
+<section class="bg-alpha-cream border border-gray-200 shadow-sm">
+<div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
+<h3 class="font-mono text-[11px] text-gray-600 uppercase font-bold tracking-widest">Sector Momentum</h3>
+<span class="material-symbols-outlined text-gray-400 text-[18px]">grid_view</span>
+</div>
+<div class="p-4 space-y-3">
+<div class="w-full bg-gray-100 h-8 flex items-center px-3 relative">
+<div class="absolute inset-0 bg-green-100 w-[85%] border-l-2 border-green-500"></div>
+<span class="relative font-mono text-[11px] font-semibold z-10 flex justify-between w-full"><span>Technology</span> <span class="text-green-700">+2.4%</span></span>
+</div>
+<div class="w-full bg-gray-100 h-8 flex items-center px-3 relative">
+<div class="absolute inset-0 bg-green-100 w-[62%] border-l-2 border-green-500"></div>
+<span class="relative font-mono text-[11px] font-semibold z-10 flex justify-between w-full"><span>Financials</span> <span class="text-green-700">+1.1%</span></span>
+</div>
+<div class="w-full bg-gray-100 h-8 flex items-center px-3 relative">
+<div class="absolute inset-0 bg-red-100 w-[45%] border-l-2 border-red-500"></div>
+<span class="relative font-mono text-[11px] font-semibold z-10 flex justify-between w-full"><span>Utilities</span> <span class="text-red-700">-0.8%</span></span>
+</div>
+</div>
+</section>
+
+<!-- Watchlist -->
+<section class="bg-alpha-cream border border-gray-200 shadow-sm">
+<div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
+<h3 class="font-mono text-[11px] text-gray-600 uppercase font-bold tracking-widest">Watchlist</h3>
+<span class="material-symbols-outlined text-gray-400 text-[18px]">visibility</span>
+</div>
+<div class="p-4">
+<div class="flex gap-2 mb-4">
+  <input type="text" id="watchlist-input" placeholder="Ticker (e.g. INFY)" class="flex-1 bg-gray-50 border border-gray-300 px-3 py-2 font-mono text-xs uppercase outline-none focus:border-gray-900 transition-colors">
+  <button onclick="addWatchlistItem()" class="bg-gray-900 text-white px-4 py-2 font-mono text-xs uppercase hover:bg-gray-800 transition-colors">+</button>
+</div>
+<div id="watchlist-items" class="space-y-px bg-gray-200">
+  <!-- Items injected here -->
+</div>
+</div>
+</section>
+
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-alpha-cream border-t border-gray-200 mt-20 py-12">
+<div class="max-w-[1600px] mx-auto px-8">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+<div class="col-span-1 md:col-span-2 space-y-6">
+<h2 class="font-serif text-2xl font-bold uppercase tracking-tight text-gray-900">THE ALPHA</h2>
+<p class="text-gray-500 max-w-sm">The definitive source for institutional-grade intelligence, bridging the gap between high-level editorial and live market execution.</p>
+</div>
+</div>
+<div class="flex flex-col md:flex-row justify-between items-center mt-16 pt-8 border-t border-gray-200 gap-4">
+<p class="font-mono text-[10px] text-gray-400 uppercase tracking-widest">© 2026 THE ALPHA INTELLIGENCE GROUP. ALL RIGHTS RESERVED.</p>
+</div>
+</div>
+</footer>
+
+<script src="data.js"></script>
+<script>
+// ==================== TABS CONFIG ====================
+const TABS = [
+    { id: 'all-news',          label: 'ALL NEWS' },
+    { id: 'ib-transactions',   label: 'IB DEALS' },
+    { id: 'tech-specs',        label: 'TECH' },
+    { id: 'energy-grid',       label: 'ENERGY & GRID' },
+    { id: 'stocks-arena',      label: 'MARKETS' },
+    { id: 'metal-shine',       label: 'COMMODITIES' },
+    { id: 'vc-inflow',         label: 'VC & PRIVATE' },
+    { id: 'regulation-patrol', label: 'REGULATION' },
+    { id: 'global-dial',       label: 'GLOBAL MACRO' },
+    { id: 'fixed-income',      label: 'FIXED INCOME' },
+    { id: 'deep-reads',        label: 'DEEP READS' },
+];
+
+function renderTabs() {
+    const nav = document.getElementById('tab-nav');
+    nav.innerHTML = TABS.map((tab, i) => {
+        // Image 1 styling: upper case, gray text, orange border for active
+        const activeClass = i === 0 
+            ? 'text-gray-900 border-b-2 border-alpha-orange' 
+            : 'text-gray-400 border-b-2 border-transparent hover:text-gray-700';
+        return `<button class="${activeClass} font-sans text-xs font-bold tracking-widest uppercase py-4 transition-colors tab-btn" data-tab="${tab.id}" onclick="switchTab('${tab.id}')">${tab.label}</button>`;
+    }).join('');
+}
+
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        if (btn.dataset.tab === tabId) {
+            btn.className = 'text-gray-900 border-b-2 border-alpha-orange font-sans text-xs font-bold tracking-widest uppercase py-4 transition-colors tab-btn';
+        } else {
+            btn.className = 'text-gray-400 border-b-2 border-transparent hover:text-gray-700 font-sans text-xs font-bold tracking-widest uppercase py-4 transition-colors tab-btn';
+        }
+    });
+    
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.style.display = content.id === `tab-${tabId}` ? 'block' : 'none';
+    });
+}
+
+function renderStoryCard(story, isLead) {
+    if (isLead) {
+        // Layout from Image 2 (Rectangular Lead Story)
+        return `
+        <article class="bg-alpha-cream border border-gray-200 shadow-sm p-8 mb-6 border-l-4 border-l-alpha-green cursor-pointer hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="font-mono text-[10px] font-bold text-alpha-green tracking-widest">LEAD STORY</span>
+                    <span class="text-gray-300">|</span>
+                    <span class="font-mono text-[10px] font-bold text-alpha-orange tracking-widest uppercase">${story.tag || 'LATEST'}</span>
+                </div>
+                <span class="font-mono text-[10px] font-bold text-gray-400 tracking-widest uppercase">${story.source}</span>
+            </div>
+            
+            <h2 class="font-serif text-3xl font-bold italic text-gray-900 mb-2 leading-tight">
+                <a href="${story.sourceUrl || '#'}" target="_blank" class="hover:text-gray-600 transition-colors">${story.headline}</a>
+            </h2>
+            
+            ${story.subline ? `<p class="font-sans text-sm italic text-gray-500 mb-4 border-l-2 border-gray-200 pl-3 py-1">${story.subline}</p>` : ''}
+            
+            <p class="font-sans text-sm text-gray-700 leading-relaxed mb-6">${story.body}</p>
+            
+            ${story.vc ? renderVCBlock(story.vc, true) : ''}
+            
+            <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-100">
+                <a href="${story.sourceUrl || '#'}" target="_blank" class="font-mono text-[10px] font-bold text-gray-400 tracking-widest hover:text-gray-900 transition-colors">READ MORE &rarr;</a>
+                <span class="font-mono text-[10px] text-gray-400 uppercase tracking-widest">${story.time || '7:00 AM'}</span>
+            </div>
+        </article>
+        `;
+    } else {
+        // Layout from Image 2 (Square Grid Story)
+        return `
+        <article class="bg-alpha-cream border border-gray-200 shadow-sm p-6 cursor-pointer hover:shadow-md transition-shadow flex flex-col h-full">
+            <div class="flex justify-between items-start mb-4">
+                <span class="font-mono text-[10px] font-bold text-alpha-orange tracking-widest uppercase break-words w-1/2">${story.tag || 'NEWS'}</span>
+                <span class="font-mono text-[9px] font-bold text-gray-400 tracking-widest uppercase text-right w-1/2 break-words">${story.source}</span>
+            </div>
+            
+            <h3 class="font-serif text-[18px] font-bold text-gray-900 mb-2 leading-snug">
+                <a href="${story.sourceUrl || '#'}" target="_blank" class="hover:text-gray-600 transition-colors">${story.headline}</a>
+            </h3>
+            
+            ${story.subline ? `<p class="font-sans text-[12px] italic text-gray-500 mb-3 border-l-2 border-gray-200 pl-2">${story.subline}</p>` : ''}
+            
+            <p class="font-sans text-[13px] text-gray-700 leading-relaxed mb-4 flex-grow">${story.body}</p>
+            
+            ${story.vc ? renderVCBlock(story.vc, false) : ''}
+            
+            <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
+                <a href="${story.sourceUrl || '#'}" target="_blank" class="font-mono text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-900 transition-colors">READ MORE &rarr;</a>
+                <span class="font-mono text-[9px] text-gray-400 uppercase tracking-widest">${story.time || '8:00 AM'}</span>
+            </div>
+        </article>
+        `;
+    }
+}
+
+function renderVCBlock(vc, isLead) {
+    const ts = isLead ? 'text-[12px]' : 'text-[10px]';
+    return `
+        <div class="bg-gray-50 p-3 mb-4 rounded-sm border border-gray-200">
+            <div class="grid grid-cols-2 gap-y-1">
+                <div class="font-sans ${ts} text-gray-500">Stage</div><div class="font-sans ${ts} font-medium text-right">${vc.stage}</div>
+                <div class="font-sans ${ts} text-gray-500">Investors</div><div class="font-sans ${ts} font-medium text-right">${vc.investors}</div>
+                ${vc.valuation ? `<div class="font-sans ${ts} text-gray-500">Valuation</div><div class="font-sans ${ts} font-medium text-right">${vc.valuation}</div>` : ''}
+            </div>
+        </div>
+    `;
+}
+
+function renderDealCard(deal, isLead) {
+    // Deal cards adapted to the rectangular/square layout aesthetic
+    const statusColor = (deal.dealStatus || '').toLowerCase() === 'completed' ? 'text-alpha-green' : 'text-gray-900';
+    
+    let metricsHtml = '';
+    if (deal.metrics) {
+        const rows = Object.entries(deal.metrics).map(([k, v]) => `
+            <div class="flex flex-col border border-gray-200 p-2 bg-gray-50">
+                <span class="font-mono text-[9px] text-gray-500 uppercase font-bold tracking-wider">${k.replace(/([A-Z])/g, ' $1').trim()}</span>
+                <span class="font-mono text-[12px] font-semibold text-gray-900">${v}</span>
+            </div>
+        `).join('');
+        metricsHtml = `<div class="grid grid-cols-2 ${isLead ? 'md:grid-cols-4' : ''} gap-2 mb-4">${rows}</div>`;
+    }
+
+    if (isLead) {
+        return `
+        <article class="bg-alpha-cream border border-gray-200 shadow-sm p-8 mb-6 border-l-4 border-l-alpha-green cursor-pointer hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
+                <div class="flex items-center gap-2">
+                    <span class="font-mono text-[10px] font-bold text-alpha-green tracking-widest">LEAD DEAL</span>
+                    <span class="text-gray-300">|</span>
+                    <span class="font-mono text-[10px] font-bold text-alpha-orange tracking-widest uppercase">${deal.dealType || 'M&A'}</span>
+                </div>
+                <span class="font-mono text-[10px] font-bold ${statusColor} tracking-widest uppercase">${deal.dealStatus || 'Announced'}</span>
+            </div>
+            
+            <div class="flex items-center gap-6 mb-4">
+                <div class="font-serif text-4xl font-bold text-gray-900">${deal.dealValue}</div>
+                <div class="flex items-center gap-3 font-sans text-lg font-medium text-gray-600">
+                    <span>${deal.acquirer}</span>
+                    <span class="material-symbols-outlined text-[16px] text-gray-400">arrow_forward</span>
+                    <span>${deal.target}</span>
+                </div>
+            </div>
+            
+            <h2 class="font-serif text-2xl font-bold italic text-gray-900 mb-3 leading-tight">${deal.headline}</h2>
+            <p class="font-sans text-sm text-gray-700 leading-relaxed mb-6">${deal.body}</p>
+            
+            ${metricsHtml}
+            
+            <div class="flex justify-between items-end mt-6 pt-4 border-t border-gray-100">
+                <div class="font-sans text-[12px] space-y-1 text-gray-600">
+                    ${deal.advisors ? `<div><span class="font-semibold text-gray-800">Buy-side:</span> ${deal.advisors.buy}</div>` : ''}
+                    ${deal.advisors && deal.advisors.sell !== 'N/A' ? `<div><span class="font-semibold text-gray-800">Sell-side:</span> ${deal.advisors.sell}</div>` : ''}
+                </div>
+                <span class="font-mono text-[10px] text-gray-400 uppercase tracking-widest">${deal.time || '9:00 AM'}</span>
+            </div>
+        </article>
+        `;
+    } else {
+        return `
+        <article class="bg-alpha-cream border border-gray-200 shadow-sm p-6 cursor-pointer hover:shadow-md transition-shadow flex flex-col h-full">
+            <div class="flex justify-between items-center mb-3 border-b border-gray-100 pb-2">
+                <span class="font-mono text-[9px] font-bold text-alpha-orange tracking-widest uppercase">${deal.dealType || 'M&A'}</span>
+                <span class="font-mono text-[9px] font-bold ${statusColor} tracking-widest uppercase">${deal.dealStatus || 'Announced'}</span>
+            </div>
+            
+            <div class="font-serif text-2xl font-bold text-gray-900 mb-1">${deal.dealValue}</div>
+            <div class="flex items-center gap-2 font-sans text-[13px] font-medium text-gray-600 mb-3">
+                <span class="truncate">${deal.acquirer}</span>
+                <span class="material-symbols-outlined text-[12px] text-gray-400">arrow_forward</span>
+                <span class="truncate">${deal.target}</span>
+            </div>
+            
+            <h3 class="font-serif text-[16px] font-bold text-gray-900 mb-2 leading-snug">${deal.headline}</h3>
+            <p class="font-sans text-[12px] text-gray-700 leading-relaxed mb-4 flex-grow">${deal.body}</p>
+            
+            ${metricsHtml}
+            
+            <div class="mt-auto pt-3 border-t border-gray-100">
+                <div class="font-sans text-[11px] space-y-0.5 text-gray-500 mb-2">
+                    ${deal.advisors ? `<div class="truncate"><span class="font-semibold text-gray-700">Buy:</span> ${deal.advisors.buy}</div>` : ''}
+                    ${deal.advisors && deal.advisors.sell !== 'N/A' ? `<div class="truncate"><span class="font-semibold text-gray-700">Sell:</span> ${deal.advisors.sell}</div>` : ''}
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="font-mono text-[9px] font-bold text-gray-400 tracking-widest">DETAILS &rarr;</span>
+                    <span class="font-mono text-[9px] text-gray-400 uppercase tracking-widest">${deal.time || '10:00 AM'}</span>
+                </div>
+            </div>
+        </article>
+        `;
+    }
+}
+
+function renderTabContent(tabConfig) {
+    const stories = STORIES[tabConfig.id] || [];
+    if (stories.length === 0) return '';
+    
+    // Sort to put lead stories first
+    const sorted = [...stories].sort((a, b) => (b.lead ? 1 : 0) - (a.lead ? 1 : 0));
+    const isDealsTab = tabConfig.id === 'ib-transactions';
+    
+    let html = `<div class="tab-content" id="tab-${tabConfig.id}">`;
+    
+    // Render Lead Story (First item)
+    if (sorted.length > 0) {
+        html += isDealsTab ? renderDealCard(sorted[0], true) : renderStoryCard(sorted[0], true);
+    }
+    
+    // Render Grid Stories (Remaining items)
+    if (sorted.length > 1) {
+        html += `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
+        for (let i = 1; i < sorted.length; i++) {
+            html += isDealsTab ? renderDealCard(sorted[i], false) : renderStoryCard(sorted[i], false);
+        }
+        html += `</div>`;
+    }
+    
+    html += `</div>`;
+    return html;
+}
+
+function renderAllContent() {
+    const area = document.getElementById('content-area');
+    area.innerHTML = TABS.map(tab => renderTabContent(tab)).join('');
+    
+    // Hide all except first
+    document.querySelectorAll('.tab-content').forEach((content, i) => {
+        if (i !== 0) content.style.display = 'none';
+    });
+}
+
+function renderTicker() {
+    const tickerData = [
+        { label: 'S&P 500', value: '5,234.12', change: '+0.45%', dir: 'up' },
+        { label: 'NASDAQ', value: '16,428.82', change: '+0.82%', dir: 'up' },
+        { label: 'NIFTY', value: '23,547.75', change: '-1.50%', dir: 'down', id: 'ticker-nifty-val' },
+        { label: 'SENSEX', value: '74,775.74', change: '-1.44%', dir: 'down', id: 'ticker-sensex-val' },
+        { label: 'USD/JPY', value: '151.34', change: '+0.12%', dir: 'up' },
+        { label: 'GOLD', value: '₹1,56,463', change: '+1.47%', dir: 'up' },
+        { label: 'WTI CRUDE', value: '$81.35', change: '-0.48%', dir: 'down' },
+        { label: 'BRENT', value: '$91.70', change: '-0.8%', dir: 'down' },
+    ];
+    
+    const items = tickerData.map(d => {
+        const colorClass = d.dir === 'up' ? 'text-green-600' : 'text-red-600';
+        const arrow = d.dir === 'up' ? '▲' : '▼';
+        const idStr = d.id ? ` id="${d.id}"` : '';
+        return `<span class="flex items-center gap-2 font-mono text-[11px] font-bold mr-12"><span class="text-gray-800">${d.label}</span> <span class="${colorClass}"${idStr}>${arrow} ${d.value} (${d.change})</span></span>`;
+    }).join('');
+    
+    document.getElementById('ticker-track').innerHTML = `<div class="flex px-8 items-center">${items}</div><div class="flex px-8 items-center">${items}</div>`;
+}
+
+// ==================== LIVE MARKET DATA ENGINE ====================
+const MARKET_DATA = {
+    nifty:   { base: 23755.20, prev: 23907.15, fmt: v => v.toLocaleString('en-IN', { maximumFractionDigits: 2 }), el: 'nifty-val',  chgEl: 'nifty-chg',  kind: 'index',     yahoo: '%5ENSEI' },
+    sensex:  { base: 75200.10, prev: 75867.80, fmt: v => v.toLocaleString('en-IN', { maximumFractionDigits: 2 }), el: 'sensex-val', chgEl: 'sensex-chg', kind: 'index',     yahoo: '%5EBSESN' },
+    usdinr:  { base: 84.85,    prev: 84.50,    fmt: v => '₹' + v.toFixed(2),          el: 'usdinr-val', chgEl: 'usdinr-chg', kind: 'fx',        yahoo: 'USDINR%3DX' },
+    gold:    { base: 158200,   prev: 154200,   fmt: v => '₹' + v.toLocaleString('en-IN', { maximumFractionDigits: 0 }), el: 'gold-val', chgEl: 'gold-chg', kind: 'commodity', yahoo: 'GC%3DF' },
+    us10y:   { base: 4.38,     prev: 4.38,     fmt: v => v.toFixed(2) + '%',          el: 'us10y-val', chgEl: 'us10y-chg', kind: 'yield',     yahoo: '%5ETNX', bps: true },
+    in10y:   { base: 7.02,     prev: 7.04,     fmt: v => v.toFixed(2) + '%',          el: 'in10y-val', chgEl: 'in10y-chg', kind: 'yield',     bps: true },
+    spread:  { base: 255,      prev: 266,      fmt: v => Math.round(v) + ' bps',      el: 'spread-val', chgEl: 'spread-chg', kind: 'spread',   bps: true },
+};
+const MARKET_LIVE = {};
+Object.keys(MARKET_DATA).forEach(k => { MARKET_LIVE[k] = MARKET_DATA[k].base; });
+
+const YF_SYMBOLS = {
+    nifty:  '^NSEI',
+    sensex: '^BSESN',
+    usdinr: 'USDINR=X',
+    gold:   'GC=F',
+    us10y:  '^TNX',
+};
+
+async function fetchYahooQuote(symbol) {
+    const url = `https://corsproxy.io/?https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1m&range=1d`;
+    try {
+        const res = await fetch(url, { mode: 'cors' });
+        if (!res.ok) return null;
+        const json = await res.json();
+        const meta = json?.chart?.result?.[0]?.meta;
+        if (!meta) return null;
+        return {
+            price: meta.regularMarketPrice ?? meta.previousClose,
+            prev:  meta.previousClose,
+            open:  meta.regularMarketOpen,
+        };
+    } catch (e) {
+        return null;
+    }
+}
+
+async function fetchAllLiveMarketData() {
+    const fetches = Object.entries(YF_SYMBOLS).map(async ([key, sym]) => {
+        const data = await fetchYahooQuote(sym);
+        if (data && data.price) {
+            MARKET_LIVE[key] = data.price;
+            MARKET_DATA[key].prev = data.prev;
+        }
+    });
+    await Promise.all(fetches);
+
+    if (MARKET_LIVE['in10y'] && MARKET_LIVE['us10y']) {
+        MARKET_LIVE['spread'] = (MARKET_LIVE['in10y'] - MARKET_LIVE['us10y']) * 100;
+    }
+
+    Object.keys(MARKET_DATA).forEach(k => renderMarketWidgetValue(k));
+}
+
+function nudge(val, kind) {
+    let pct;
+    if (kind === 'yield') pct = (Math.random() - 0.5) * 0.002;
+    else if (kind === 'fx') pct = (Math.random() - 0.5) * 0.0003;
+    else if (kind === 'spread') return val + (Math.random() - 0.5) * 0.5;
+    else pct = (Math.random() - 0.5) * 0.0015;
+    return val * (1 + pct);
+}
+
+function renderMarketWidgetValue(key) {
+    const cfg = MARKET_DATA[key];
+    const val = MARKET_LIVE[key];
+    const prev = cfg.prev || cfg.base;
+
+    const diff = val - prev;
+    const direction = diff >= 0 ? 'up' : 'down';
+    const arrow = direction === 'up' ? '▲' : '▼';
+
+    const valEl = document.getElementById(cfg.el);
+    const chgEl = document.getElementById(cfg.chgEl);
+    if (!valEl || !chgEl) return;
+
+    valEl.textContent = cfg.fmt(val);
+
+    if (cfg.bps) {
+        const bpsDiff = Math.abs(Math.round(diff * (cfg.kind === 'spread' ? 1 : 100)));
+        chgEl.textContent = `${arrow} ${direction === 'up' ? '+' : '−'}${bpsDiff} bps`;
+    } else {
+        const pct = (diff / prev) * 100;
+        chgEl.textContent = `${arrow} ${direction === 'up' ? '+' : ''}${pct.toFixed(2)}%`;
+    }
+    
+    const colorClass = direction === 'up' ? 'text-green-600' : 'text-red-600';
+    chgEl.className = `font-mono text-[10px] ${colorClass}`;
+}
+
+function updateMarketWidget(key) {
+    const cfg = MARKET_DATA[key];
+    const oldVal = MARKET_LIVE[key];
+    let newVal;
+    if (cfg.kind === 'spread') {
+        newVal = (MARKET_LIVE['in10y'] - MARKET_LIVE['us10y']) * 100;
+    } else {
+        newVal = nudge(oldVal, cfg.kind);
+    }
+    MARKET_LIVE[key] = newVal;
+
+    renderMarketWidgetValue(key);
+}
+
+function tickMarket() {
+    Object.keys(MARKET_DATA).forEach(k => updateMarketWidget(k));
+}
+
+// ==================== WATCHLIST ====================
+function loadWatchlist() {
+    try { return JSON.parse(localStorage.getItem('alpha-watchlist') || '[]'); }
+    catch (e) { return []; }
+}
+function saveWatchlist(list) {
+    localStorage.setItem('alpha-watchlist', JSON.stringify(list));
+}
+
+function renderWatchlist() {
+    const list = loadWatchlist();
+    const container = document.getElementById('watchlist-items');
+    if (!container) return;
+
+    if (list.length === 0) {
+        container.innerHTML = `<div class="p-4 text-center font-mono text-[10px] text-gray-500 bg-alpha-cream">No tickers tracked. Add one above.</div>`;
+        return;
+    }
+
+    container.innerHTML = list.map(sym => {
+        const seed = sym.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+        const price = (100 + (seed % 900)).toFixed(2);
+        const change = (((seed % 20) - 10) / 10).toFixed(2);
+        const isUp = parseFloat(change) >= 0;
+        const color = isUp ? 'text-green-600' : 'text-red-600';
+        const arrow = isUp ? '▲' : '▼';
+        return `
+            <div class="flex justify-between items-center p-3 bg-alpha-cream" id="wl-${sym}">
+                <div>
+                    <div class="font-mono text-[11px] font-bold text-gray-800">${sym}</div>
+                    <div class="font-mono text-[10px] text-gray-500">₹${price}</div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="font-mono text-[10px] font-semibold ${color}">${arrow} ${Math.abs(change)}%</span>
+                    <button onclick="removeWatchlistItem('${sym}')" class="material-symbols-outlined text-[14px] text-gray-300 hover:text-red-500 transition-colors">close</button>
+                </div>
+            </div>`;
+    }).join('');
+}
+
+function addWatchlistItem() {
+    const input = document.getElementById('watchlist-input');
+    const sym = (input.value || '').trim().toUpperCase();
+    if (!sym) return;
+    const list = loadWatchlist();
+    if (!list.includes(sym) && list.length < 10) {
+        list.push(sym);
+        saveWatchlist(list);
+        renderWatchlist();
+    }
+    input.value = '';
+}
+
+function removeWatchlistItem(sym) {
+    const list = loadWatchlist().filter(s => s !== sym);
+    saveWatchlist(list);
+    renderWatchlist();
+}
+
+
+function init() {
+    renderTabs();
+    renderAllContent();
+    renderTicker();
+    renderWatchlist();
+    
+    Object.keys(MARKET_DATA).forEach(k => renderMarketWidgetValue(k));
+    fetchAllLiveMarketData();
+    setInterval(tickMarket, 6000);
+    setInterval(fetchAllLiveMarketData, 60000);
+    
+    window.addWatchlistItem = addWatchlistItem;
+    window.removeWatchlistItem = removeWatchlistItem;
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body></html>
+"""
+
+with open('index.html', 'w', encoding='utf-8') as f:
+    f.write(html_content)
+
+print("index.html rewritten successfully with accurate Hybrid Grid layout from screenshots!")

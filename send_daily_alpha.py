@@ -4,7 +4,8 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import json
-import subprocess
+import sqlite3
+import os
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -15,22 +16,33 @@ SENDER_EMAIL = os.getenv("SENDER_EMAIL")
 SENDER_PASSWORD = os.getenv("SENDER_APP_PASSWORD")
 RECEIVER_EMAIL = os.getenv("RECEIVER_EMAIL")
 
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
+
 def get_stories():
-    """Extract the STORIES object from data.js securely using Node.js."""
-    try:
-        # Evaluate data.js and print the STORIES object as JSON
-        script = """
-        const fs = require('fs');
-        const code = fs.readFileSync('data.js', 'utf8');
-        eval(code.replace('const STORIES', 'global.STORIES'));
-        console.log(JSON.stringify(global.STORIES));
-        """
-        result = subprocess.run(['node', '-e', script], capture_output=True, text=True, check=True, encoding='utf-8')
-        return json.loads(result.stdout)
-    except Exception as e:
-        print(f"Node JS Parse Error: {e}")
+    """Extract the STORIES from the SQLite database."""
+    if not os.path.exists('alpha.db'):
+        print("Database not found.")
+        return None
+        
+    conn = sqlite3.connect('alpha.db')
+    conn.row_factory = dict_factory
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM stories ORDER BY lead DESC, id ASC')
+    rows = cursor.fetchall()
+    conn.close()
     
-    return None
+    stories = {}
+    for row in rows:
+        cat = row.pop('category')
+        if cat not in stories:
+            stories[cat] = []
+        stories[cat].append(row)
+    
+    return stories
 
 
 def get_article_url(story):
@@ -124,7 +136,7 @@ def send_email():
         print("Please ensure SENDER_EMAIL and SENDER_APP_PASSWORD are set.")
         return False
         
-    print("Reading news from data.js...")
+    print("Reading news from alpha.db...")
     stories = get_stories()
     if not stories:
         print("Failed to load stories.")

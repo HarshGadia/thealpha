@@ -3,6 +3,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>THE ALPHA | Integrated Intelligence</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -38,17 +39,16 @@
         }
         .ticker-scroll {
             display: flex;
-            animation: ticker 30s linear infinite;
-        }
-        @keyframes ticker {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+            /* Animation removed to make ticker static */
         }
         .data-grid-row:nth-child(even) { background-color: #f1f5f9; }
         
         /* Hide scrollbar for tabs */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        html.dark { filter: invert(1) hue-rotate(180deg); background-color: #111; }
+        html.dark img, html.dark video { filter: invert(1) hue-rotate(180deg); }
     </style>
 </head>
 <body class="font-sans text-sm bg-alpha-cream">
@@ -59,18 +59,35 @@
         <h1 class="font-serif text-4xl font-bold uppercase tracking-tight text-gray-900">THE ALPHA</h1>
     </div>
     <div class="flex items-center gap-4">
-        <button class="material-symbols-outlined text-gray-500 hover:bg-gray-100 p-2 rounded transition-colors">light_mode</button>
+        <input type="text" id="search-input" placeholder="Search..." onkeyup="handleSearch()" class="bg-transparent border border-gray-300 px-3 py-2 font-mono text-xs outline-none focus:border-gray-900 transition-colors w-48">
         <button onclick="location.reload()" class="bg-gray-900 text-white px-6 py-2 font-mono text-xs uppercase tracking-widest hover:bg-gray-800 transition-all">Refresh Now</button>
     </div>
 </div>
 </header>
 
 <!-- Dedicated Tab Bar (from Image 1) -->
-<div class="bg-alpha-cream border-b border-gray-200 sticky top-0 z-50">
+<div class="bg-alpha-cream border-b border-gray-200 sticky top-0 z-40">
     <div class="max-w-[1600px] mx-auto px-8 overflow-x-auto no-scrollbar">
         <div id="tab-nav" class="flex items-center gap-8 whitespace-nowrap">
             <!-- Tabs rendered via JS -->
         </div>
+    </div>
+</div>
+
+<!-- Subscription Gate Modal -->
+<div id="welcome-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center backdrop-blur-sm hidden">
+    <div class="bg-alpha-cream p-8 max-w-md w-full text-center border border-gray-200 shadow-2xl relative">
+        <img src="mascot.png" alt="The Alpha" class="w-32 h-auto mx-auto mb-4" style="mix-blend-mode: multiply;">
+        <h2 class="font-serif text-2xl font-bold text-gray-900 mb-2">Unlock The Alpha</h2>
+        <p class="font-sans text-sm text-gray-600 mb-6">Enter your email to access the definitive source for institutional-grade intelligence.</p>
+        
+        <form id="popup-subscribe-form" onsubmit="handleSubscribePopup(event)">
+            <div class="flex flex-col gap-3">
+                <input type="email" id="popup-email" class="w-full bg-white border border-gray-300 px-4 py-3 font-mono text-sm outline-none focus:border-gray-900 transition-colors text-center" placeholder="Your best email address" required>
+                <button type="submit" id="popup-sub-btn" class="w-full bg-gray-900 text-white px-6 py-3 font-mono text-xs uppercase tracking-widest hover:bg-gray-800 transition-colors">Get Access Now</button>
+            </div>
+        </form>
+        <p id="popup-msg" class="font-mono text-xs mt-4 h-4"></p>
     </div>
 </div>
 
@@ -90,21 +107,7 @@
 </div>
 <!-- Integrated Intelligence (Right Rail) -->
 <div class="col-span-12 lg:col-span-3 space-y-8">
-<!-- Subscribe Widget -->
-<section class="bg-alpha-cream border border-gray-200 shadow-sm mb-8">
-<div class="flex items-center justify-between p-4 border-b border-gray-200 bg-alpha-cream">
-<h3 class="font-mono text-[11px] text-gray-600 uppercase font-bold tracking-widest">Get The Daily Dispatch</h3>
-<span class="material-symbols-outlined text-gray-400 text-[18px]">mail</span>
-</div>
-<div class="p-4 bg-alpha-cream">
-<p class="font-sans text-xs text-gray-600 mb-3">Join other professionals receiving our 9:00 AM curated intelligence briefing.</p>
-<div class="flex gap-2 mb-2">
-  <input type="email" id="subscribe-email" placeholder="Your work email" class="flex-1 bg-white border border-gray-300 px-3 py-2 font-mono text-xs outline-none focus:border-gray-900 transition-colors">
-  <button onclick="handleSubscribe()" class="bg-gray-900 text-white px-4 py-2 font-mono text-xs uppercase hover:bg-gray-800 transition-colors">Subscribe</button>
-</div>
-<p id="subscribe-msg" class="font-mono text-[10px] text-green-700 hidden"></p>
-</div>
-</section>
+
 
 <!-- Market Snapshot -->
 <section class="bg-alpha-cream border border-gray-200 shadow-sm">
@@ -255,8 +258,10 @@
 </div>
 </footer>
 
-<script src="data.js"></script>
 <script>
+let STORIES = {};
+let ORIGINAL_STORIES = {}; // For search filtering
+
 // ==================== TABS CONFIG ====================
 const TABS = [
     { id: 'all-news',          label: 'ALL NEWS' },
@@ -312,7 +317,7 @@ function renderStoryCard(story, isLead) {
             </div>
             
             <h2 class="font-serif text-3xl font-bold italic text-gray-900 mb-2 leading-tight">
-                <a href="${story.articleUrl || 'https://www.google.com/search?q=' + encodeURIComponent(story.headline + ' ' + story.source)}"  target="_blank" class="hover:text-gray-600 transition-colors">${story.headline}</a>
+                <a href="${getArticleUrl(story)}"  target="_blank" class="hover:text-gray-600 transition-colors">${story.headline}</a>
             </h2>
             
             ${story.subline ? `<p class="font-sans text-sm italic text-gray-500 mb-4 border-l-2 border-gray-200 pl-3 py-1">${story.subline}</p>` : ''}
@@ -404,7 +409,9 @@ function renderDealCard(deal, isLead) {
                 </div>
             </div>
             
-            <h2 class="font-serif text-2xl font-bold italic text-gray-900 mb-3 leading-tight">${deal.headline}</h2>
+            <h2 class="font-serif text-2xl font-bold italic text-gray-900 mb-3 leading-tight">
+                <a href="${getArticleUrl(deal)}" target="_blank" class="hover:text-gray-600 transition-colors">${deal.headline}</a>
+            </h2>
             <p class="font-sans text-sm text-gray-700 leading-relaxed mb-6">${deal.body}</p>
             
             ${metricsHtml}
@@ -414,7 +421,10 @@ function renderDealCard(deal, isLead) {
                     ${deal.advisors ? `<div><span class="font-semibold text-gray-800">Buy-side:</span> ${deal.advisors.buy}</div>` : ''}
                     ${deal.advisors && deal.advisors.sell !== 'N/A' ? `<div><span class="font-semibold text-gray-800">Sell-side:</span> ${deal.advisors.sell}</div>` : ''}
                 </div>
-                <span class="font-mono text-[10px] text-gray-400 uppercase tracking-widest">${deal.time || '9:00 AM'}</span>
+                <div class="flex flex-col items-end gap-2">
+                    <a href="${getArticleUrl(deal)}" target="_blank" class="font-mono text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-900 transition-colors">DETAILS &rarr;</a>
+                    <span class="font-mono text-[10px] text-gray-400 uppercase tracking-widest">${deal.time || '9:00 AM'}</span>
+                </div>
             </div>
         </article>
         `;
@@ -433,7 +443,9 @@ function renderDealCard(deal, isLead) {
                 <span class="truncate">${deal.target}</span>
             </div>
             
-            <h3 class="font-serif text-[16px] font-bold text-gray-900 mb-2 leading-snug">${deal.headline}</h3>
+            <h3 class="font-serif text-[16px] font-bold text-gray-900 mb-2 leading-snug">
+                <a href="${getArticleUrl(deal)}" target="_blank" class="hover:text-gray-600 transition-colors">${deal.headline}</a>
+            </h3>
             <p class="font-sans text-[12px] text-gray-700 leading-relaxed mb-4 flex-grow">${deal.body}</p>
             
             ${metricsHtml}
@@ -444,7 +456,7 @@ function renderDealCard(deal, isLead) {
                     ${deal.advisors && deal.advisors.sell !== 'N/A' ? `<div class="truncate"><span class="font-semibold text-gray-700">Sell:</span> ${deal.advisors.sell}</div>` : ''}
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="font-mono text-[9px] font-bold text-gray-400 tracking-widest">DETAILS &rarr;</span>
+                    <a href="${getArticleUrl(deal)}" target="_blank" class="font-mono text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-900 transition-colors">DETAILS &rarr;</a>
                     <span class="font-mono text-[9px] text-gray-400 uppercase tracking-widest">${deal.time || '10:00 AM'}</span>
                 </div>
             </div>
@@ -455,7 +467,15 @@ function renderDealCard(deal, isLead) {
 
 function renderTabContent(tabConfig) {
     const stories = STORIES[tabConfig.id] || [];
-    if (stories.length === 0) return '';
+    if (stories.length === 0) {
+        return `<div class="tab-content" id="tab-${tabConfig.id}">
+            <div class="flex flex-col items-center justify-center py-20 bg-alpha-cream border border-dashed border-gray-300">
+                <span class="material-symbols-outlined text-gray-300 text-4xl mb-3">article</span>
+                <p class="font-mono text-[11px] text-gray-500 uppercase tracking-widest font-bold">No intelligence available</p>
+                <p class="font-sans text-[13px] text-gray-400 mt-2">There are currently no stories indexed for ${tabConfig.label}.</p>
+            </div>
+        </div>`;
+    }
     
     // Sort to put lead stories first
     const sorted = [...stories].sort((a, b) => (b.lead ? 1 : 0) - (a.lead ? 1 : 0));
@@ -489,6 +509,12 @@ function renderAllContent() {
     document.querySelectorAll('.tab-content').forEach((content, i) => {
         if (i !== 0) content.style.display = 'none';
     });
+
+    // Re-apply active tab if one was selected
+    const activeBtn = document.querySelector('.tab-btn.text-gray-900');
+    if (activeBtn) {
+        switchTab(activeBtn.dataset.tab);
+    }
 }
 
 function renderTicker() {
@@ -535,17 +561,15 @@ const YF_SYMBOLS = {
 };
 
 async function fetchYahooQuote(symbol) {
-    const url = `https://corsproxy.io/?https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1m&range=1d`;
+    const url = `/api/market-data?symbol=${encodeURIComponent(symbol)}`;
     try {
-        const res = await fetch(url, { mode: 'cors' });
+        const res = await fetch(url);
         if (!res.ok) return null;
-        const json = await res.json();
-        const meta = json?.chart?.result?.[0]?.meta;
-        if (!meta) return null;
+        const data = await res.json();
         return {
-            price: meta.regularMarketPrice ?? meta.previousClose,
-            prev:  meta.previousClose,
-            open:  meta.regularMarketOpen,
+            price: data.price,
+            prev:  data.prev,
+            open:  data.open,
         };
     } catch (e) {
         return null;
@@ -683,19 +707,102 @@ function removeWatchlistItem(sym) {
 }
 
 
+function handleSearch() {
+    const q = document.getElementById('search-input').value.toLowerCase();
+    
+    // Reset stories
+    STORIES = JSON.parse(JSON.stringify(ORIGINAL_STORIES));
+    
+    if (q) {
+        for (const cat in STORIES) {
+            STORIES[cat] = STORIES[cat].filter(s => 
+                (s.headline && s.headline.toLowerCase().includes(q)) || 
+                (s.body && s.body.toLowerCase().includes(q)) ||
+                (s.tag && s.tag.toLowerCase().includes(q))
+            );
+        }
+    }
+    renderAllContent();
+}
+
+async function handleSubscribePopup(e) {
+    e.preventDefault();
+    const emailInput = document.getElementById('popup-email');
+    const btn = document.getElementById('popup-sub-btn');
+    const msg = document.getElementById('popup-msg');
+    const email = emailInput.value.trim();
+    
+    if (!email) return;
+    
+    btn.textContent = "Verifying...";
+    btn.disabled = true;
+    msg.textContent = "";
+    
+    try {
+        const res = await fetch('/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        
+        if (res.ok) {
+            msg.textContent = "Access Granted!";
+            msg.className = "font-mono text-xs mt-4 h-4 text-green-600";
+            setTimeout(() => {
+                document.getElementById('welcome-modal').classList.add('hidden');
+                // Optionally save to localStorage so it doesn't pop up again
+                localStorage.setItem('alpha-access', 'true');
+            }, 800);
+        } else {
+            msg.textContent = data.error || "Failed.";
+            msg.className = "font-mono text-xs mt-4 h-4 text-red-600";
+            btn.textContent = "Get Access Now";
+            btn.disabled = false;
+        }
+    } catch (err) {
+        msg.textContent = "Network error.";
+        msg.className = "font-mono text-xs mt-4 h-4 text-red-600";
+        btn.textContent = "Get Access Now";
+        btn.disabled = false;
+    }
+}
+
+async function fetchStories() {
+    try {
+        const res = await fetch('/api/stories');
+        if (res.ok) {
+            STORIES = await res.json();
+            ORIGINAL_STORIES = JSON.parse(JSON.stringify(STORIES));
+            renderAllContent();
+        }
+    } catch (e) {
+        console.error("Failed to load stories", e);
+    }
+}
+
+function getArticleUrl(story) {
+    if (story.articleUrl) return story.articleUrl;
+    return '#';
+}
+
 function init() {
     renderTabs();
-    renderAllContent();
+    fetchStories();
     renderTicker();
     renderWatchlist();
     
     Object.keys(MARKET_DATA).forEach(k => renderMarketWidgetValue(k));
     fetchAllLiveMarketData();
-    setInterval(tickMarket, 6000);
-    setInterval(fetchAllLiveMarketData, 60000);
+    // Intervals removed to make market data static
     
     window.addWatchlistItem = addWatchlistItem;
     window.removeWatchlistItem = removeWatchlistItem;
+
+    // Show popup if not already subscribed
+    if (!localStorage.getItem('alpha-access')) {
+        document.getElementById('welcome-modal').classList.remove('hidden');
+    }
 }
 
 document.addEventListener('DOMContentLoaded', init);

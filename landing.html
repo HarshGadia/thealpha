@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>The Alpha | Subscribe</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet"/>
+    <style>
+        body {
+            background-color: #fdfbf7;
+            font-family: 'Inter', sans-serif;
+            color: #0f172a;
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .mascot {
+            width: 250px;
+            height: auto;
+            margin: 0 auto 30px;
+            display: block;
+            mix-blend-mode: multiply; /* Fixes background color mismatch */
+        }
+        .title {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .sub-count {
+            font-size: 14px;
+            font-weight: 600;
+            color: #9ca3af;
+            margin-bottom: 40px;
+        }
+        .input-group {
+            display: flex;
+            max-width: 400px;
+            margin: 0 auto 20px;
+        }
+        .email-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-right: none;
+            border-radius: 6px 0 0 6px;
+            outline: none;
+            font-size: 14px;
+            background-color: #fff;
+        }
+        .email-input:focus {
+            border-color: #f97316;
+        }
+        .subscribe-btn {
+            background-color: #fca5a5;
+            color: white;
+            border: none;
+            padding: 0 24px;
+            font-weight: 600;
+            border-radius: 0 6px 6px 0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 14px;
+        }
+        .subscribe-btn:hover {
+            background-color: #f87171;
+        }
+        .terms {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-bottom: 30px;
+        }
+        .terms a {
+            color: #9ca3af;
+            text-decoration: underline;
+        }
+        .no-thanks {
+            font-size: 14px;
+            color: #6b7280;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .no-thanks:hover {
+            color: #374151;
+        }
+        .message {
+            font-size: 14px;
+            margin-top: 10px;
+            font-weight: 500;
+            height: 20px;
+        }
+        .success { color: #059669; }
+        .error { color: #dc2626; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="mascot.png" alt="The Alpha Mascot" class="mascot">
+        <h1 class="title">The Alpha</h1>
+        <p class="subtitle">The definitive source for institutional-grade intelligence - bridging the gap between high-level editorial and live market execution</p>
+        <p class="sub-count">Over 26,000 subscribers</p>
+        
+        <form id="subscribe-form" onsubmit="handleSubscribe(event)">
+            <div class="input-group">
+                <input type="email" id="email" class="email-input" placeholder="Type your email..." required>
+                <button type="submit" class="subscribe-btn" id="sub-btn">Subscribe</button>
+            </div>
+        </form>
+        
+        <div id="msg" class="message"></div>
+        
+        <p class="terms">
+            By subscribing, you agree to The Alpha's <a href="#">Terms of Use</a>, and<br>acknowledge its <a href="#">Information Collection Notice</a> and <a href="#">Privacy Policy</a>.
+        </p>
+        
+        <a href="/dashboard" class="no-thanks">No thanks &gt;</a>
+    </div>
+
+    <script>
+        async function handleSubscribe(e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('email');
+            const btn = document.getElementById('sub-btn');
+            const msg = document.getElementById('msg');
+            const email = emailInput.value.trim();
+            
+            if (!email) return;
+            
+            btn.textContent = "Subscribing...";
+            btn.disabled = true;
+            msg.textContent = "";
+            msg.className = "message";
+            
+            try {
+                const res = await fetch('/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    msg.textContent = data.message || "Subscribed!";
+                    msg.className = "message success";
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1000);
+                } else {
+                    msg.textContent = data.error || "Failed.";
+                    msg.className = "message error";
+                    btn.textContent = "Subscribe";
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                msg.textContent = "Network error.";
+                msg.className = "message error";
+                btn.textContent = "Subscribe";
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

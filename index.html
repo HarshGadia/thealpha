@@ -77,6 +77,9 @@
 <!-- Subscription Gate Modal -->
 <div id="welcome-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center backdrop-blur-sm hidden">
     <div class="bg-alpha-cream p-8 max-w-md w-full text-center border border-gray-200 shadow-2xl relative">
+        <button onclick="document.getElementById('welcome-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-900 transition-colors" title="Skip">
+            <span class="material-symbols-outlined">close</span>
+        </button>
         <img src="mascot.png" alt="The Alpha" class="w-32 h-auto mx-auto mb-4" style="mix-blend-mode: multiply;">
         <h2 class="font-serif text-2xl font-bold text-gray-900 mb-2">Unlock The Alpha</h2>
         <p class="font-sans text-sm text-gray-600 mb-6">Enter your email to access the definitive source for institutional-grade intelligence.</p>

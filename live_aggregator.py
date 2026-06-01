@@ -25,10 +25,52 @@ FEEDS = [
         'tag': 'EQUITY'
     },
     {
+        'url': 'https://economictimes.indiatimes.com/tech/startups/rssfeeds/107115.cms',
+        'category': 'STARTUPS',
+        'source': 'Economic Times',
+        'tag': 'STARTUP'
+    },
+    {
         'url': 'https://finance.yahoo.com/news/rssindex',
         'category': 'TOP_NEWS',
         'source': 'Yahoo Finance',
         'tag': 'MACRO'
+    },
+    {
+        'url': 'https://www.livemint.com/rss/markets',
+        'category': 'MARKETS',
+        'source': 'Mint',
+        'tag': 'EQUITY'
+    },
+    {
+        'url': 'https://www.livemint.com/rss/companies',
+        'category': 'TOP_NEWS',
+        'source': 'Mint',
+        'tag': 'CORP'
+    },
+    {
+        'url': 'https://feeds.a.dj.com/rss/WSJcomUSBusiness.xml',
+        'category': 'TOP_NEWS',
+        'source': 'Wall Street Journal',
+        'tag': 'BUSINESS'
+    },
+    {
+        'url': 'https://feeds.a.dj.com/rss/RSSMarketsMain.xml',
+        'category': 'MARKETS',
+        'source': 'Wall Street Journal',
+        'tag': 'MARKETS'
+    },
+    {
+        'url': 'https://www.ft.com/companies?format=rss',
+        'category': 'TOP_NEWS',
+        'source': 'Financial Times',
+        'tag': 'GLOBAL'
+    },
+    {
+        'url': 'https://www.moneycontrol.com/rss/business.xml',
+        'category': 'TOP_NEWS',
+        'source': 'Moneycontrol',
+        'tag': 'INDIA'
     }
 ]
 

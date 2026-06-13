@@ -51,8 +51,13 @@
         }
 
         @keyframes ticker {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
         }
 
         .data-grid-row:nth-child(even) {
@@ -99,10 +104,13 @@
             </div>
             <div class="flex flex-col md:flex-row items-center gap-6">
                 <!-- Saved Button in Header -->
-                <button onclick="toggleSavedDrawer(true)" class="relative flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 font-mono text-xs uppercase hover:bg-gray-900 hover:text-white transition-all duration-200" title="View Saved Articles">
+                <button onclick="toggleSavedDrawer(true)"
+                    class="relative flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 font-mono text-xs uppercase hover:bg-gray-900 hover:text-white transition-all duration-200"
+                    title="View Saved Articles">
                     <span class="material-symbols-outlined text-[18px]">bookmark</span>
                     <span>Saved</span>
-                    <span id="saved-badge" class="absolute -top-2 -right-2 bg-alpha-orange text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold transition-transform duration-200 scale-0">0</span>
+                    <span id="saved-badge"
+                        class="absolute -top-2 -right-2 bg-alpha-orange text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold transition-transform duration-200 scale-0">0</span>
                 </button>
                 <div class="relative group">
                     <input type="text" id="search-input" oninput="handleSearch()" placeholder="Search intel..."
@@ -260,14 +268,16 @@
                 <!-- Saved Reads Sidebar Widget -->
                 <section class="bg-white border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
-                        <h3 class="font-mono text-[11px] text-gray-900 uppercase font-bold tracking-widest">Saved Reads</h3>
+                        <h3 class="font-mono text-[11px] text-gray-900 uppercase font-bold tracking-widest">Saved Reads
+                        </h3>
                         <span class="material-symbols-outlined text-gray-400 text-[18px]">bookmark</span>
                     </div>
                     <div class="p-4">
                         <div id="sidebar-saved-items" class="space-y-3">
                             <!-- Injected via JS -->
                         </div>
-                        <button onclick="toggleSavedDrawer(true)" class="w-full mt-4 bg-gray-50 hover:bg-gray-100 text-gray-900 border border-gray-200 py-2 font-mono text-[10px] uppercase font-bold tracking-wider transition-colors text-center block">
+                        <button onclick="toggleSavedDrawer(true)"
+                            class="w-full mt-4 bg-gray-50 hover:bg-gray-100 text-gray-900 border border-gray-200 py-2 font-mono text-[10px] uppercase font-bold tracking-wider transition-colors text-center block">
                             View All Saved Intel
                         </button>
                     </div>
@@ -295,7 +305,8 @@
     </footer>
 
     <!-- Slide-out Saved Articles Drawer -->
-    <div id="saved-drawer" class="fixed inset-y-0 right-0 w-full max-w-md bg-alpha-cream border-l border-gray-200 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+    <div id="saved-drawer"
+        class="fixed inset-y-0 right-0 w-full max-w-md bg-alpha-cream border-l border-gray-200 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
         <!-- Drawer Header -->
         <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-white">
             <div class="flex items-center gap-2">
@@ -306,24 +317,28 @@
                 <span class="material-symbols-outlined text-[24px]">close</span>
             </button>
         </div>
-        
+
         <!-- Drawer Content -->
         <div id="saved-drawer-items" class="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar">
             <!-- Saved items will be injected here -->
         </div>
-        
+
         <!-- Drawer Footer -->
         <div class="p-6 border-t border-gray-200 bg-white flex justify-between items-center">
             <span id="saved-drawer-count" class="font-mono text-[10px] text-gray-500 uppercase">0 articles saved</span>
-            <button onclick="clearAllSaved()" class="font-mono text-[10px] text-red-600 hover:text-red-800 uppercase font-bold tracking-wider">Clear All</button>
+            <button onclick="clearAllSaved()"
+                class="font-mono text-[10px] text-red-600 hover:text-red-800 uppercase font-bold tracking-wider">Clear
+                All</button>
         </div>
     </div>
-    
+
     <!-- Drawer Overlay Backdrop -->
-    <div id="saved-drawer-backdrop" onclick="toggleSavedDrawer(false)" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 hidden transition-opacity duration-300 opacity-0"></div>
+    <div id="saved-drawer-backdrop" onclick="toggleSavedDrawer(false)"
+        class="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 hidden transition-opacity duration-300 opacity-0"></div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-gray-900 text-white px-4 py-3 font-mono text-xs uppercase tracking-widest shadow-2xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center gap-2">
+    <div id="toast"
+        class="fixed bottom-5 right-5 bg-gray-900 text-white px-4 py-3 font-mono text-xs uppercase tracking-widest shadow-2xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center gap-2">
         <span class="material-symbols-outlined text-[16px] text-alpha-orange">info</span>
         <span id="toast-msg"></span>
     </div>
@@ -420,7 +435,7 @@
 
         function updateSavedUI() {
             const saved = loadSavedArticles();
-            
+
             // 1. Update Header Badge Count
             const badge = document.getElementById('saved-badge');
             if (badge) {
@@ -433,13 +448,13 @@
                     badge.classList.add('scale-0');
                 }
             }
-            
+
             // 2. Update Drawer Items Count
             const drawerCount = document.getElementById('saved-drawer-count');
             if (drawerCount) {
                 drawerCount.textContent = `${saved.length} article${saved.length === 1 ? '' : 's'} saved`;
             }
-            
+
             // 3. Render Drawer Content
             const drawerContainer = document.getElementById('saved-drawer-items');
             if (drawerContainer) {
@@ -458,7 +473,7 @@
                         const tag = story.tag || story.dealType || "NEWS";
                         const body = story.body ? (story.body.length > 120 ? story.body.substring(0, 120) + '...' : story.body) : '';
                         const articleUrl = getArticleUrl(story);
-                        
+
                         return `
                             <div class="p-4 bg-white border border-gray-200 hover:border-gray-300 transition-colors shadow-sm relative group">
                                 <div class="flex justify-between items-start gap-2 mb-2">
@@ -480,7 +495,7 @@
                     }).join('');
                 }
             }
-            
+
             // 4. Render Sidebar Widget Content
             const sidebarContainer = document.getElementById('sidebar-saved-items');
             if (sidebarContainer) {
@@ -523,7 +538,7 @@
             if (!saved.some(s => s.id == storyId)) {
                 saved.unshift(foundStory);
                 localStorage.setItem('alpha-saved-stories', JSON.stringify(saved));
-                
+
                 showToast(`Article saved! <button onclick="toggleSavedDrawer(true); event.stopPropagation();" class="underline ml-2 text-alpha-orange font-bold hover:text-white transition-colors">VIEW LIST &rarr;</button>`);
                 updateSavedUI();
                 renderAllContent();
@@ -614,7 +629,7 @@
             <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-100">
                 <div class="flex items-center gap-4">
                     <a href="${story.articleUrl || 'https://www.google.com/search?q=' + encodeURIComponent(story.headline + ' ' + story.source)}"  target="_blank" class="font-mono text-[10px] font-bold text-gray-400 tracking-widest hover:text-gray-900 transition-colors">READ MORE &rarr;</a>
-                    ${isSavedPage 
+                    ${isSavedPage
                         ? `<button onclick="unsaveArticle(${story.id}); event.stopPropagation();" class="font-mono text-[10px] font-bold text-red-600 tracking-widest hover:text-red-800 transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_remove</span> REMOVE</button>`
                         : `<button onclick="saveArticle(${story.id}); event.stopPropagation();" class="font-mono text-[10px] font-bold text-gray-400 tracking-widest hover:text-gray-900 transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_add</span> SAVE</button>`
                     }
@@ -646,10 +661,10 @@
             </div>
             
             <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
-                ${isSavedPage 
-                    ? `<button onclick="unsaveArticle(${story.id}); event.stopPropagation();" class="font-mono text-[9px] font-bold text-red-600 tracking-widest hover:text-red-800 transition-colors uppercase flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_remove</span> REMOVE</button>`
-                    : `<button onclick="saveArticle(${story.id}); event.stopPropagation();" class="font-mono text-[9px] font-bold text-gray-900 tracking-widest hover:text-gray-500 transition-colors uppercase flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_add</span> SAVE</button>`
-                }
+                ${isSavedPage
+                        ? `<button onclick="unsaveArticle(${story.id}); event.stopPropagation();" class="font-mono text-[9px] font-bold text-red-600 tracking-widest hover:text-red-800 transition-colors uppercase flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_remove</span> REMOVE</button>`
+                        : `<button onclick="saveArticle(${story.id}); event.stopPropagation();" class="font-mono text-[9px] font-bold text-gray-900 tracking-widest hover:text-gray-500 transition-colors uppercase flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_add</span> SAVE</button>`
+                    }
                 <span class="font-mono text-[9px] text-gray-400 uppercase tracking-widest">${formatTimeAgo(story.time) || '8:00 AM'}</span>
             </div>
             </div>
@@ -722,10 +737,10 @@
                 <div class="flex flex-col items-end gap-2">
                     <div class="flex items-center gap-3">
                         <a href="${getArticleUrl(deal)}" target="_blank" class="font-mono text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-900 transition-colors">DETAILS &rarr;</a>
-                        ${isSavedPage 
-                            ? `<button onclick="unsaveArticle(${deal.id}); event.stopPropagation();" class="font-mono text-[9px] font-bold text-red-600 tracking-widest hover:text-red-800 transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_remove</span> REMOVE</button>`
-                            : `<button onclick="saveArticle(${deal.id}); event.stopPropagation();" class="font-mono text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-500 transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_add</span> SAVE</button>`
-                        }
+                        ${isSavedPage
+                        ? `<button onclick="unsaveArticle(${deal.id}); event.stopPropagation();" class="font-mono text-[9px] font-bold text-red-600 tracking-widest hover:text-red-800 transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_remove</span> REMOVE</button>`
+                        : `<button onclick="saveArticle(${deal.id}); event.stopPropagation();" class="font-mono text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-500 transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_add</span> SAVE</button>`
+                    }
                     </div>
                     <span class="font-mono text-[10px] text-gray-400 uppercase tracking-widest">${formatTimeAgo(deal.time) || '9:00 AM'}</span>
                 </div>
@@ -764,10 +779,10 @@
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-3">
                         <a href="${getArticleUrl(deal)}" target="_blank" class="font-mono text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-900 transition-colors">DETAILS &rarr;</a>
-                        ${isSavedPage 
-                            ? `<button onclick="unsaveArticle(${deal.id}); event.stopPropagation();" class="font-mono text-[9px] font-bold text-red-600 tracking-widest hover:text-red-800 transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_remove</span> REMOVE</button>`
-                            : `<button onclick="saveArticle(${deal.id}); event.stopPropagation();" class="font-mono text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-500 transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_add</span> SAVE</button>`
-                        }
+                        ${isSavedPage
+                        ? `<button onclick="unsaveArticle(${deal.id}); event.stopPropagation();" class="font-mono text-[9px] font-bold text-red-600 tracking-widest hover:text-red-800 transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_remove</span> REMOVE</button>`
+                        : `<button onclick="saveArticle(${deal.id}); event.stopPropagation();" class="font-mono text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-500 transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_add</span> SAVE</button>`
+                    }
                     </div>
                     <span class="font-mono text-[9px] text-gray-400 uppercase tracking-widest">${formatTimeAgo(deal.time) || '10:00 AM'}</span>
                 </div>
@@ -813,8 +828,8 @@
 
             // Render Lead Story (First item)
             if (sorted.length > 0) {
-                html += isDealsTab 
-                    ? renderDealCard(sorted[0], true, isSavedTab) 
+                html += isDealsTab
+                    ? renderDealCard(sorted[0], true, isSavedTab)
                     : renderStoryCard(sorted[0], true, isSavedTab);
             }
 
@@ -825,8 +840,8 @@
                 const displayItems = isSavedTab ? gridItems : gridItems.slice(0, 6);
                 for (let i = 0; i < displayItems.length; i++) {
                     html += `<div class="bg-white">`;
-                    html += isDealsTab 
-                        ? renderDealCard(displayItems[i], false, isSavedTab) 
+                    html += isDealsTab
+                        ? renderDealCard(displayItems[i], false, isSavedTab)
                         : renderStoryCard(displayItems[i], false, isSavedTab);
                     html += `</div>`;
                 }
@@ -1144,7 +1159,7 @@
 
             Object.keys(MARKET_DATA).forEach(k => renderMarketWidgetValue(k));
             fetchAllLiveMarketData();
-            
+
             // Re-enabled live market updates
             setInterval(tickMarket, 6000);
             setInterval(fetchAllLiveMarketData, 60000);

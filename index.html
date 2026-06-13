@@ -1,319 +1,596 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>THE ALPHA | Integrated Intelligence</title>
-<link rel="icon" type="image/x-icon" href="/favicon.ico"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-                    "sans": ["Inter", "sans-serif"],
-                    "serif": ["Playfair Display", "serif"],
-                    "mono": ["JetBrains Mono", "monospace"]
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>THE ALPHA | Integrated Intelligence</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        "sans": ["Inter", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    colors: {
+                        "alpha-orange": "#f97316",
+                        "alpha-green": "#059669",
+                        "surface-variant": "#f1f5f9",
+                        "alpha-cream": "#fdfbf7"
+                    }
+                },
             },
-            colors: {
-                "alpha-orange": "#f97316",
-                "alpha-green": "#059669",
-                "surface-variant": "#f1f5f9",
-                "alpha-cream": "#fdfbf7"
-            }
-          },
-        },
-      }
+        }
     </script>
-<style>
+    <style>
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
             display: inline-block;
             vertical-align: middle;
         }
+
         body {
             background-color: #f8fafc;
             color: #0f172a;
             -webkit-font-smoothing: antialiased;
         }
+
         .ticker-scroll {
             display: flex;
-            /* Animation removed to make ticker static */
+            animation: ticker 30s linear infinite;
         }
-        .data-grid-row:nth-child(even) { background-color: #f1f5f9; }
-        
-        /* Hide scrollbar for tabs */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        html.dark { filter: invert(1) hue-rotate(180deg); background-color: #111; }
-        html.dark img, html.dark video { filter: invert(1) hue-rotate(180deg); }
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .data-grid-row:nth-child(even) {
+            background-color: #f1f5f9;
+        }
+
+        /* Hide scrollbar for tabs */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        html.dark {
+            filter: invert(1) hue-rotate(180deg);
+            background-color: #111;
+        }
+
+        html.dark img,
+        html.dark video {
+            filter: invert(1) hue-rotate(180deg);
+        }
     </style>
 </head>
-<body class="font-sans text-sm bg-alpha-cream">
-<!-- Top Logo Header -->
-<header class="bg-alpha-cream border-b border-gray-200">
-<div class="flex flex-col md:flex-row items-center justify-between py-4 md:py-6 px-4 md:px-8 max-w-[1600px] mx-auto gap-4 md:gap-0">
-    <div class="flex items-center gap-4">
-        <!-- Logo Image -->
-        <img src="mascot.png" alt="The Alpha" class="w-16 md:w-20 h-auto" style="mix-blend-mode: multiply;">
-        <h1 class="font-serif text-3xl md:text-5xl font-bold uppercase tracking-tight text-gray-900 leading-none">
-            <span class="block text-[10px] md:text-[12px] font-sans font-bold text-gray-500 tracking-[0.3em] mb-1">INTEGRATED INTELLIGENCE</span>
-            THE ALPHA
-        </h1>
-    </div>
-    <div class="text-center md:text-right">
-        <p class="font-mono text-xs md:text-sm text-gray-500 uppercase tracking-widest font-bold" id="current-date">MONDAY, MAY 31, 2026</p>
-        <p class="font-sans text-[10px] md:text-xs text-gray-400 mt-1">VOL. IV / NO. 142</p>
-    </div>
-</div>
-</header>
 
-<!-- Dedicated Tab Bar (from Image 1) -->
-<div class="bg-alpha-cream border-b border-gray-200 sticky top-0 z-40">
-    <div class="max-w-[1600px] mx-auto px-4 md:px-8 overflow-x-auto no-scrollbar">
-        <div id="tab-nav" class="flex items-center gap-6 md:gap-8 whitespace-nowrap">
-            <!-- Tabs rendered via JS -->
+<body class="font-sans text-sm bg-alpha-cream">
+    <!-- Top Logo Header -->
+    <header class="bg-alpha-cream border-b border-gray-200">
+        <div
+            class="flex flex-col md:flex-row items-center justify-between py-4 md:py-6 px-4 md:px-8 max-w-[1600px] mx-auto gap-4 md:gap-0">
+            <div class="flex items-center gap-4">
+                <!-- Logo Image -->
+                <img src="mascot.png" alt="The Alpha" class="w-16 md:w-20 h-auto" style="mix-blend-mode: multiply;">
+                <h1
+                    class="font-serif text-3xl md:text-5xl font-bold uppercase tracking-tight text-gray-900 leading-none">
+                    <span
+                        class="block text-[10px] md:text-[12px] font-sans font-bold text-gray-500 tracking-[0.3em] mb-1">INTEGRATED
+                        INTELLIGENCE</span>
+                    THE ALPHA
+                </h1>
+            </div>
+            <div class="flex flex-col md:flex-row items-center gap-6">
+                <!-- Saved Button in Header -->
+                <button onclick="toggleSavedDrawer(true)" class="relative flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 font-mono text-xs uppercase hover:bg-gray-900 hover:text-white transition-all duration-200" title="View Saved Articles">
+                    <span class="material-symbols-outlined text-[18px]">bookmark</span>
+                    <span>Saved</span>
+                    <span id="saved-badge" class="absolute -top-2 -right-2 bg-alpha-orange text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold transition-transform duration-200 scale-0">0</span>
+                </button>
+                <div class="relative group">
+                    <input type="text" id="search-input" oninput="handleSearch()" placeholder="Search intel..."
+                        class="bg-white border border-gray-300 font-mono text-xs uppercase px-4 py-2 w-48 md:w-64 focus:border-gray-900 focus:outline-none transition-colors">
+                    <span
+                        class="material-symbols-outlined absolute right-3 top-2 text-gray-400 text-[18px] group-focus-within:text-gray-900">search</span>
+                </div>
+                <div class="text-center md:text-right hidden md:block">
+                    <p class="font-mono text-xs md:text-sm text-gray-500 uppercase tracking-widest font-bold"
+                        id="current-date">MONDAY, MAY 31, 2026</p>
+                    <p class="font-sans text-[10px] md:text-xs text-gray-400 mt-1">VOL. IV / NO. 142</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Global Market Ticker -->
+    <div
+        class="bg-white border-b border-gray-200 text-gray-900 py-2 overflow-hidden whitespace-nowrap sticky top-0 z-50 shadow-sm">
+        <div class="ticker-scroll" id="ticker-track">
+            <!-- Ticker items rendered via JS -->
         </div>
     </div>
-</div>
 
-<!-- Subscription Gate Modal -->
-<div id="welcome-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center backdrop-blur-sm hidden px-4">
-    <div class="bg-alpha-cream p-6 md:p-8 max-w-md w-full text-center border border-gray-200 shadow-2xl relative">
-        <button onclick="document.getElementById('welcome-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-900 transition-colors" title="Skip">
-            <span class="material-symbols-outlined">close</span>
-        </button>
-        <img src="mascot.png" alt="The Alpha" class="w-24 md:w-32 h-auto mx-auto mb-4" style="mix-blend-mode: multiply;">
-        <h2 class="font-serif text-xl md:text-2xl font-bold text-gray-900 mb-2">Unlock The Alpha</h2>
-        <p class="font-sans text-xs md:text-sm text-gray-600 mb-6">Enter your email to access the definitive source for institutional-grade intelligence.</p>
-        
-        <form id="popup-subscribe-form" onsubmit="handleSubscribePopup(event)">
-            <div class="flex flex-col gap-3">
-                <input type="email" id="popup-email" class="w-full bg-white border border-gray-300 px-4 py-3 font-mono text-sm outline-none focus:border-gray-900 transition-colors text-center" placeholder="Your best email address" required>
-                <button type="submit" id="popup-sub-btn" class="w-full bg-gray-900 text-white px-6 py-3 font-mono text-xs uppercase tracking-widest hover:bg-gray-800 transition-colors">Get Access Now</button>
+    <!-- Dedicated Tab Bar (from Image 1) -->
+    <div class="bg-alpha-cream border-b border-gray-200 sticky top-0 z-40">
+        <div class="max-w-[1600px] mx-auto px-4 md:px-8">
+            <div id="tab-nav"
+                class="flex flex-wrap items-center justify-center md:justify-start gap-x-6 gap-y-2 md:gap-x-8 py-2">
+                <!-- Tabs rendered via JS -->
             </div>
-        </form>
-        <p id="popup-msg" class="font-mono text-xs mt-4 h-4"></p>
+        </div>
     </div>
-</div>
 
-<!-- Global Market Ticker -->
-<div class="bg-surface-variant text-gray-700 py-2 overflow-hidden whitespace-nowrap border-b border-gray-200">
-<div class="ticker-scroll" id="ticker-track">
-<!-- Ticker items rendered via JS -->
-</div>
-</div>
+    <!-- Subscription Gate Modal -->
+    <div id="welcome-modal"
+        class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center backdrop-blur-sm hidden px-4">
+        <div class="bg-alpha-cream p-6 md:p-8 max-w-md w-full text-center border border-gray-200 shadow-2xl relative">
+            <button onclick="document.getElementById('welcome-modal').classList.add('hidden')"
+                class="absolute top-4 right-4 text-gray-400 hover:text-gray-900 transition-colors" title="Skip">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <img src="mascot.png" alt="The Alpha" class="w-24 md:w-32 h-auto mx-auto mb-4"
+                style="mix-blend-mode: multiply;">
+            <h2 class="font-serif text-xl md:text-2xl font-bold text-gray-900 mb-2">Unlock The Alpha</h2>
+            <p class="font-sans text-xs md:text-sm text-gray-600 mb-6">Enter your email to access the definitive source
+                for institutional-grade intelligence.</p>
 
-<!-- Main Content Canvas -->
-<main class="max-w-[1600px] mx-auto px-4 md:px-8 py-6 md:py-8">
-<div class="grid grid-cols-12 gap-8">
-<!-- News Feed (Left & Center) -->
-<div class="col-span-12 lg:col-span-9" id="content-area">
-    <!-- Tab content injected here -->
-</div>
-<!-- Integrated Intelligence (Right Rail) -->
-<div class="col-span-12 lg:col-span-3 space-y-8">
-
-
-<!-- Market Snapshot -->
-<section class="bg-alpha-cream border border-gray-200 shadow-sm">
-<div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
-<h3 class="font-mono text-[11px] text-gray-600 uppercase font-bold tracking-widest">Market Snapshot</h3>
-<span class="material-symbols-outlined text-gray-400 text-[18px]">show_chart</span>
-</div>
-<div class="space-y-px bg-gray-200">
-<div class="flex justify-between p-3 bg-alpha-cream">
-<span class="font-sans font-medium text-gray-800 text-sm">NIFTY 50</span>
-<div class="text-right">
-  <div id="nifty-val" class="font-mono text-sm font-semibold">23,547.75</div>
-  <div id="nifty-chg" class="font-mono text-[10px] text-red-600">▼ -1.50%</div>
-</div>
-</div>
-<div class="flex justify-between p-3 bg-alpha-cream">
-<span class="font-sans font-medium text-gray-800 text-sm">SENSEX</span>
-<div class="text-right">
-  <div id="sensex-val" class="font-mono text-sm font-semibold">74,775.74</div>
-  <div id="sensex-chg" class="font-mono text-[10px] text-red-600">▼ -1.44%</div>
-</div>
-</div>
-<div class="flex justify-between p-3 bg-alpha-cream">
-<span class="font-sans font-medium text-gray-800 text-sm">INDIA VIX</span>
-<div class="text-right">
-  <div class="font-mono text-sm font-semibold text-red-600">15.20</div>
-  <div class="font-mono text-[10px] text-red-600">▲ +2.34%</div>
-</div>
-</div>
-<div class="flex justify-between p-3 bg-alpha-cream">
-<span class="font-sans font-medium text-gray-800 text-sm">GOLD</span>
-<div class="text-right">
-  <div id="gold-val" class="font-mono text-sm font-semibold">₹1,56,463</div>
-  <div id="gold-chg" class="font-mono text-[10px] text-green-600">▲ +1.47%</div>
-</div>
-</div>
-</div>
-</section>
-
-<!-- Yield Curve Intelligence -->
-<section class="bg-alpha-cream border border-gray-200 shadow-sm">
-<div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
-<h3 class="font-mono text-[11px] text-gray-600 uppercase font-bold tracking-widest">Yields & Forex</h3>
-<span class="material-symbols-outlined text-gray-400 text-[18px]">trending_up</span>
-</div>
-<div class="grid grid-cols-2 gap-px bg-gray-200">
-<div class="p-3 bg-alpha-cream">
-<p class="font-mono text-[10px] text-gray-500 mb-1">US 10Y</p>
-<p id="us10y-val" class="font-mono text-sm font-semibold">4.45%</p>
-<p id="us10y-chg" class="font-mono text-[10px] text-green-600">▲ +7 bps</p>
-</div>
-<div class="p-3 bg-alpha-cream">
-<p class="font-mono text-[10px] text-gray-500 mb-1">IN 10Y</p>
-<p id="in10y-val" class="font-mono text-sm font-semibold">7.00%</p>
-<p id="in10y-chg" class="font-mono text-[10px] text-red-600">▼ -4 bps</p>
-</div>
-<div class="p-3 bg-alpha-cream">
-<p class="font-mono text-[10px] text-gray-500 mb-1">USD / INR</p>
-<p id="usdinr-val" class="font-mono text-sm font-semibold">₹84.96</p>
-<p id="usdinr-chg" class="font-mono text-[10px] text-green-600">▲ +0.54%</p>
-</div>
-<div class="p-3 bg-alpha-cream">
-<p class="font-mono text-[10px] text-gray-500 mb-1">Spread</p>
-<p id="spread-val" class="font-mono text-sm font-semibold">255 bps</p>
-<p id="spread-chg" class="font-mono text-[10px] text-red-600">▼ -11 bps</p>
-</div>
-</div>
-</section>
-
-<!-- Economic Calendar -->
-<section class="bg-alpha-cream border border-gray-200 shadow-sm">
-<div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
-<h3 class="font-mono text-[11px] text-gray-600 uppercase font-bold tracking-widest">Upcoming Catalysts</h3>
-<span class="material-symbols-outlined text-gray-400 text-[18px]">event</span>
-</div>
-<div class="space-y-px bg-gray-200">
-  <div class="p-4 bg-alpha-cream">
-    <div class="flex justify-between items-center mb-1">
-      <span class="font-mono text-[11px] font-semibold text-gray-800">RBI Monetary Policy</span>
-      <span class="font-mono text-[10px] font-bold text-red-600">Tomorrow</span>
+            <form id="popup-subscribe-form" onsubmit="handleSubscribePopup(event)">
+                <div class="flex flex-col gap-3">
+                    <input type="email" id="popup-email"
+                        class="w-full bg-white border border-gray-300 px-4 py-3 font-mono text-sm outline-none focus:border-gray-900 transition-colors text-center"
+                        placeholder="Your best email address" required>
+                    <button type="submit" id="popup-sub-btn"
+                        class="w-full bg-gray-900 text-white px-6 py-3 font-mono text-xs uppercase tracking-widest hover:bg-gray-800 transition-colors">Get
+                        Access Now</button>
+                </div>
+            </form>
+            <p id="popup-msg" class="font-mono text-xs mt-4 h-4"></p>
+        </div>
     </div>
-    <p class="font-sans text-xs text-gray-600 mt-2">Expected rate hold at 6.5%. Watch for stance change.</p>
-  </div>
-  <div class="p-4 bg-alpha-cream">
-    <div class="flex justify-between items-center mb-1">
-      <span class="font-mono text-[11px] font-semibold text-gray-800">US Non-Farm Payrolls</span>
-      <span class="font-mono text-[10px] font-bold text-gray-900">Friday</span>
+
+
+
+    <!-- Main Content Canvas -->
+    <main class="max-w-[1600px] mx-auto px-4 md:px-8 py-6 md:py-8">
+        <div class="grid grid-cols-12 gap-8">
+            <!-- News Feed (Left & Center) -->
+            <div class="col-span-12 lg:col-span-9" id="content-area">
+                <!-- Tab content injected here -->
+            </div>
+            <!-- Integrated Intelligence (Right Rail) -->
+            <div class="col-span-12 lg:col-span-3 space-y-8">
+
+                <!-- Macro & Rates Intelligence -->
+                <section class="bg-white border border-gray-200">
+                    <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
+                        <h3 class="font-mono text-[11px] text-gray-900 uppercase font-bold tracking-widest">Macro &
+                            Rates</h3>
+                        <span class="material-symbols-outlined text-gray-400 text-[18px]">public</span>
+                    </div>
+                    <div class="space-y-0">
+                        <!-- Yield Rate IN 10Y -->
+                        <div
+                            class="flex justify-between items-center p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                            <span class="font-sans font-semibold text-gray-900 text-sm">India 10Y Yield</span>
+                            <div class="text-right">
+                                <div id="in10y-val" class="font-mono text-sm font-bold text-gray-900">7.00%</div>
+                                <div id="in10y-chg" class="font-mono text-[10px] text-red-600 font-semibold">▼ -4 bps
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Yield Rate US 10Y -->
+                        <div
+                            class="flex justify-between items-center p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                            <span class="font-sans font-semibold text-gray-900 text-sm">US 10Y Yield</span>
+                            <div class="text-right">
+                                <div id="us10y-val" class="font-mono text-sm font-bold text-gray-900">4.45%</div>
+                                <div id="us10y-chg" class="font-mono text-[10px] text-green-600 font-semibold">▲ +7 bps
+                                </div>
+                            </div>
+                        </div>
+                        <!-- US Dollar in India -->
+                        <div
+                            class="flex justify-between items-center p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                            <span class="font-sans font-semibold text-gray-900 text-sm">USD / INR</span>
+                            <div class="text-right">
+                                <div id="usdinr-val" class="font-mono text-sm font-bold text-gray-900">₹84.96</div>
+                                <div id="usdinr-chg" class="font-mono text-[10px] text-green-600 font-semibold">▲ +0.54%
+                                </div>
+                            </div>
+                        </div>
+                        <!-- RBI Repo Rate -->
+                        <div
+                            class="flex justify-between items-center p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                            <span class="font-sans font-semibold text-gray-900 text-sm">RBI Repo Rate</span>
+                            <div class="text-right">
+                                <div id="reporate-val" class="font-mono text-sm font-bold text-gray-900">6.50%</div>
+                                <div id="reporate-chg" class="font-mono text-[10px] text-gray-400 font-semibold">
+                                    UNCHANGED</div>
+                            </div>
+                        </div>
+                        <!-- US Fed Rate -->
+                        <div class="flex justify-between items-center p-4 hover:bg-gray-50 transition-colors">
+                            <span class="font-sans font-semibold text-gray-900 text-sm">US Fed Rate</span>
+                            <div class="text-right">
+                                <div id="fedrate-val" class="font-mono text-sm font-bold text-gray-900">5.50%</div>
+                                <div id="fedrate-chg" class="font-mono text-[10px] text-gray-400 font-semibold">
+                                    UNCHANGED</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Watchlist -->
+                <section class="bg-alpha-cream border border-gray-200 shadow-sm">
+                    <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
+                        <h3 class="font-mono text-[11px] text-gray-600 uppercase font-bold tracking-widest">Watchlist
+                        </h3>
+                        <span class="material-symbols-outlined text-gray-400 text-[18px]">visibility</span>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex gap-2 mb-4">
+                            <input type="text" id="watchlist-input" placeholder="Ticker (e.g. INFY)"
+                                class="flex-1 bg-gray-50 border border-gray-300 px-3 py-2 font-mono text-xs uppercase outline-none focus:border-gray-900 transition-colors">
+                            <button onclick="addWatchlistItem()"
+                                class="bg-gray-900 text-white px-4 py-2 font-mono text-xs uppercase hover:bg-gray-800 transition-colors">+</button>
+                        </div>
+                        <div id="watchlist-items" class="space-y-px bg-gray-200">
+                            <!-- Items injected here -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Saved Reads Sidebar Widget -->
+                <section class="bg-white border border-gray-200 shadow-sm">
+                    <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
+                        <h3 class="font-mono text-[11px] text-gray-900 uppercase font-bold tracking-widest">Saved Reads</h3>
+                        <span class="material-symbols-outlined text-gray-400 text-[18px]">bookmark</span>
+                    </div>
+                    <div class="p-4">
+                        <div id="sidebar-saved-items" class="space-y-3">
+                            <!-- Injected via JS -->
+                        </div>
+                        <button onclick="toggleSavedDrawer(true)" class="w-full mt-4 bg-gray-50 hover:bg-gray-100 text-gray-900 border border-gray-200 py-2 font-mono text-[10px] uppercase font-bold tracking-wider transition-colors text-center block">
+                            View All Saved Intel
+                        </button>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-alpha-cream border-t border-gray-200 mt-12 md:mt-20 py-8 md:py-12">
+        <div class="max-w-[1600px] mx-auto px-4 md:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+                <div class="col-span-1 md:col-span-2 space-y-6">
+                    <h2 class="font-serif text-2xl font-bold uppercase tracking-tight text-gray-900">THE ALPHA</h2>
+                    <p class="text-gray-500 max-w-sm">The definitive source for institutional-grade intelligence,
+                        bridging the gap between high-level editorial and live market execution.</p>
+                </div>
+            </div>
+            <div
+                class="flex flex-col md:flex-row justify-between items-center mt-16 pt-8 border-t border-gray-200 gap-4">
+                <p class="font-mono text-[10px] text-gray-400 uppercase tracking-widest">© 2026 THE ALPHA INTELLIGENCE
+                    GROUP. ALL RIGHTS RESERVED.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Slide-out Saved Articles Drawer -->
+    <div id="saved-drawer" class="fixed inset-y-0 right-0 w-full max-w-md bg-alpha-cream border-l border-gray-200 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+        <!-- Drawer Header -->
+        <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-white">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-alpha-orange">bookmark</span>
+                <h2 class="font-serif text-lg font-bold uppercase tracking-tight text-gray-900">Saved Intelligence</h2>
+            </div>
+            <button onclick="toggleSavedDrawer(false)" class="text-gray-400 hover:text-gray-900 transition-colors">
+                <span class="material-symbols-outlined text-[24px]">close</span>
+            </button>
+        </div>
+        
+        <!-- Drawer Content -->
+        <div id="saved-drawer-items" class="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar">
+            <!-- Saved items will be injected here -->
+        </div>
+        
+        <!-- Drawer Footer -->
+        <div class="p-6 border-t border-gray-200 bg-white flex justify-between items-center">
+            <span id="saved-drawer-count" class="font-mono text-[10px] text-gray-500 uppercase">0 articles saved</span>
+            <button onclick="clearAllSaved()" class="font-mono text-[10px] text-red-600 hover:text-red-800 uppercase font-bold tracking-wider">Clear All</button>
+        </div>
     </div>
-    <p class="font-sans text-xs text-gray-600 mt-2">Consensus 180k. Impact on Fed dot plot critical.</p>
-  </div>
-</div>
-</section>
-
-<!-- Sector Momentum -->
-<section class="bg-alpha-cream border border-gray-200 shadow-sm">
-<div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
-<h3 class="font-mono text-[11px] text-gray-600 uppercase font-bold tracking-widest">Sector Momentum</h3>
-<span class="material-symbols-outlined text-gray-400 text-[18px]">grid_view</span>
-</div>
-<div class="p-4 space-y-3">
-<div class="w-full bg-gray-100 h-8 flex items-center px-3 relative">
-<div class="absolute inset-0 bg-green-100 w-[85%] border-l-2 border-green-500"></div>
-<span class="relative font-mono text-[11px] font-semibold z-10 flex justify-between w-full"><span>Technology</span> <span class="text-green-700">+2.4%</span></span>
-</div>
-<div class="w-full bg-gray-100 h-8 flex items-center px-3 relative">
-<div class="absolute inset-0 bg-green-100 w-[62%] border-l-2 border-green-500"></div>
-<span class="relative font-mono text-[11px] font-semibold z-10 flex justify-between w-full"><span>Financials</span> <span class="text-green-700">+1.1%</span></span>
-</div>
-<div class="w-full bg-gray-100 h-8 flex items-center px-3 relative">
-<div class="absolute inset-0 bg-red-100 w-[45%] border-l-2 border-red-500"></div>
-<span class="relative font-mono text-[11px] font-semibold z-10 flex justify-between w-full"><span>Utilities</span> <span class="text-red-700">-0.8%</span></span>
-</div>
-</div>
-</section>
-
-<!-- Watchlist -->
-<section class="bg-alpha-cream border border-gray-200 shadow-sm">
-<div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
-<h3 class="font-mono text-[11px] text-gray-600 uppercase font-bold tracking-widest">Watchlist</h3>
-<span class="material-symbols-outlined text-gray-400 text-[18px]">visibility</span>
-</div>
-<div class="p-4">
-<div class="flex gap-2 mb-4">
-  <input type="text" id="watchlist-input" placeholder="Ticker (e.g. INFY)" class="flex-1 bg-gray-50 border border-gray-300 px-3 py-2 font-mono text-xs uppercase outline-none focus:border-gray-900 transition-colors">
-  <button onclick="addWatchlistItem()" class="bg-gray-900 text-white px-4 py-2 font-mono text-xs uppercase hover:bg-gray-800 transition-colors">+</button>
-</div>
-<div id="watchlist-items" class="space-y-px bg-gray-200">
-  <!-- Items injected here -->
-</div>
-</div>
-</section>
-
-</div>
-</div>
-</main>
-<!-- Footer -->
-<footer class="bg-alpha-cream border-t border-gray-200 mt-12 md:mt-20 py-8 md:py-12">
-<div class="max-w-[1600px] mx-auto px-4 md:px-8">
-<div class="grid grid-cols-1 md:grid-cols-4 gap-10">
-<div class="col-span-1 md:col-span-2 space-y-6">
-<h2 class="font-serif text-2xl font-bold uppercase tracking-tight text-gray-900">THE ALPHA</h2>
-<p class="text-gray-500 max-w-sm">The definitive source for institutional-grade intelligence, bridging the gap between high-level editorial and live market execution.</p>
-</div>
-</div>
-<div class="flex flex-col md:flex-row justify-between items-center mt-16 pt-8 border-t border-gray-200 gap-4">
-<p class="font-mono text-[10px] text-gray-400 uppercase tracking-widest">© 2026 THE ALPHA INTELLIGENCE GROUP. ALL RIGHTS RESERVED.</p>
-</div>
-</div>
-</footer>
-
-<script>
-let STORIES = {};
-let ORIGINAL_STORIES = {}; // For search filtering
-
-// ==================== TABS CONFIG ====================
-const TABS = [
-    { id: 'all-news',          label: 'ALL NEWS' },
-    { id: 'ib-transactions',   label: 'IB DEALS' },
-    { id: 'tech-specs',        label: 'TECH' },
-    { id: 'energy-grid',       label: 'ENERGY & GRID' },
-    { id: 'stocks-arena',      label: 'MARKETS' },
-    { id: 'metal-shine',       label: 'COMMODITIES' },
-    { id: 'vc-inflow',         label: 'VC & PRIVATE' },
-    { id: 'regulation-patrol', label: 'REGULATION' },
-    { id: 'global-dial',       label: 'GLOBAL MACRO' },
-    { id: 'fixed-income',      label: 'FIXED INCOME' },
-    { id: 'deep-reads',        label: 'DEEP READS' },
-];
-
-function renderTabs() {
-    const nav = document.getElementById('tab-nav');
-    nav.innerHTML = TABS.map((tab, i) => {
-        // Image 1 styling: upper case, gray text, orange border for active
-        const activeClass = i === 0 
-            ? 'text-gray-900 border-b-2 border-alpha-orange' 
-            : 'text-gray-400 border-b-2 border-transparent hover:text-gray-700';
-        return `<button class="${activeClass} font-sans text-xs font-bold tracking-widest uppercase py-4 transition-colors tab-btn" data-tab="${tab.id}" onclick="switchTab('${tab.id}')">${tab.label}</button>`;
-    }).join('');
-}
-
-function switchTab(tabId) {
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        if (btn.dataset.tab === tabId) {
-            btn.className = 'text-gray-900 border-b-2 border-alpha-orange font-sans text-xs font-bold tracking-widest uppercase py-4 transition-colors tab-btn';
-        } else {
-            btn.className = 'text-gray-400 border-b-2 border-transparent hover:text-gray-700 font-sans text-xs font-bold tracking-widest uppercase py-4 transition-colors tab-btn';
-        }
-    });
     
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.style.display = content.id === `tab-${tabId}` ? 'block' : 'none';
-    });
-}
+    <!-- Drawer Overlay Backdrop -->
+    <div id="saved-drawer-backdrop" onclick="toggleSavedDrawer(false)" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 hidden transition-opacity duration-300 opacity-0"></div>
 
-function renderStoryCard(story, isLead) {
-    if (isLead) {
-        // Layout from Image 2 (Rectangular Lead Story)
-        return `
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-900 text-white px-4 py-3 font-mono text-xs uppercase tracking-widest shadow-2xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center gap-2">
+        <span class="material-symbols-outlined text-[16px] text-alpha-orange">info</span>
+        <span id="toast-msg"></span>
+    </div>
+
+    <script>
+        let STORIES = {};
+        let ORIGINAL_STORIES = {}; // For search filtering
+
+        function formatTimeAgo(timeStr) {
+            if (!timeStr) return '';
+            if (!timeStr.includes('-') && !timeStr.includes('T')) {
+                return timeStr;
+            }
+            try {
+                const date = new Date(timeStr);
+                if (isNaN(date.getTime())) {
+                    return timeStr;
+                }
+                const now = new Date();
+                const diffMs = now - date;
+                if (diffMs < 0) {
+                    return "JUST NOW";
+                }
+                const diffMins = Math.floor(diffMs / 60000);
+                if (diffMins < 60) {
+                    return `${diffMins}M AGO`;
+                }
+                const diffHrs = Math.floor(diffMins / 60);
+                if (diffHrs < 24) {
+                    return `${diffHrs}H AGO`;
+                }
+                const options = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
+                return date.toLocaleString('en-US', options).toUpperCase();
+            } catch (e) {
+                return timeStr;
+            }
+        }
+
+        // ==================== TABS CONFIG ====================
+        const TABS = [
+            { id: 'all-news', label: 'ALL NEWS' },
+            { id: 'ib-transactions', label: 'IB DEALS' },
+            { id: 'tech-specs', label: 'TECH' },
+            { id: 'energy-grid', label: 'ENERGY & GRID' },
+            { id: 'stocks-arena', label: 'MARKETS' },
+            { id: 'metal-shine', label: 'COMMODITIES' },
+            { id: 'vc-inflow', label: 'VC & PRIVATE' },
+            { id: 'regulation-patrol', label: 'REGULATION' },
+            { id: 'global-dial', label: 'GLOBAL MACRO' },
+            { id: 'fixed-income', label: 'FIXED INCOME' },
+            { id: 'deep-reads', label: 'DEEP READS' },
+            { id: 'saved-articles', label: 'SAVED' },
+        ];
+
+        // ==================== SAVED ARTICLES ENGINE ====================
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            if (!toast || !toastMsg) return;
+            toastMsg.innerHTML = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 4000);
+        }
+
+        function loadSavedArticles() {
+            try { return JSON.parse(localStorage.getItem('alpha-saved-stories') || '[]'); }
+            catch (e) { return []; }
+        }
+
+        function toggleSavedDrawer(open) {
+            const drawer = document.getElementById('saved-drawer');
+            const backdrop = document.getElementById('saved-drawer-backdrop');
+            if (!drawer || !backdrop) return;
+            if (open) {
+                backdrop.classList.remove('hidden');
+                setTimeout(() => {
+                    backdrop.classList.remove('opacity-0');
+                    backdrop.classList.add('opacity-100');
+                    drawer.classList.remove('translate-x-full');
+                }, 10);
+            } else {
+                drawer.classList.add('translate-x-full');
+                backdrop.classList.remove('opacity-100');
+                backdrop.classList.add('opacity-0');
+                setTimeout(() => {
+                    backdrop.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        function updateSavedUI() {
+            const saved = loadSavedArticles();
+            
+            // 1. Update Header Badge Count
+            const badge = document.getElementById('saved-badge');
+            if (badge) {
+                badge.textContent = saved.length;
+                if (saved.length > 0) {
+                    badge.classList.remove('scale-0');
+                    badge.classList.add('scale-100');
+                } else {
+                    badge.classList.remove('scale-100');
+                    badge.classList.add('scale-0');
+                }
+            }
+            
+            // 2. Update Drawer Items Count
+            const drawerCount = document.getElementById('saved-drawer-count');
+            if (drawerCount) {
+                drawerCount.textContent = `${saved.length} article${saved.length === 1 ? '' : 's'} saved`;
+            }
+            
+            // 3. Render Drawer Content
+            const drawerContainer = document.getElementById('saved-drawer-items');
+            if (drawerContainer) {
+                if (saved.length === 0) {
+                    drawerContainer.innerHTML = `
+                        <div class="flex flex-col items-center justify-center py-20 text-center">
+                            <span class="material-symbols-outlined text-gray-300 text-5xl mb-4 font-light">bookmark</span>
+                            <p class="font-mono text-[11px] text-gray-500 uppercase tracking-widest font-bold">No Saved Intelligence</p>
+                            <p class="font-sans text-xs text-gray-400 mt-2 max-w-[220px] mx-auto">Click the save button on articles to read them later offline.</p>
+                        </div>
+                    `;
+                } else {
+                    drawerContainer.innerHTML = saved.map(story => {
+                        const headline = story.headline || "Untitled";
+                        const source = story.source || "M&A Intelligence";
+                        const tag = story.tag || story.dealType || "NEWS";
+                        const body = story.body ? (story.body.length > 120 ? story.body.substring(0, 120) + '...' : story.body) : '';
+                        const articleUrl = getArticleUrl(story);
+                        
+                        return `
+                            <div class="p-4 bg-white border border-gray-200 hover:border-gray-300 transition-colors shadow-sm relative group">
+                                <div class="flex justify-between items-start gap-2 mb-2">
+                                    <span class="font-mono text-[9px] font-bold text-alpha-orange tracking-widest uppercase border border-gray-200 px-2 py-0.5">${tag}</span>
+                                    <span class="font-mono text-[8px] font-bold text-gray-400 tracking-widest uppercase">${source}</span>
+                                </div>
+                                <h4 class="font-serif text-sm font-bold text-gray-900 mb-1 leading-snug">
+                                    <a href="${articleUrl}" target="_blank" class="hover:text-alpha-orange transition-colors">${headline}</a>
+                                </h4>
+                                ${body ? `<p class="font-sans text-[11px] text-gray-500 leading-normal mb-3">${body}</p>` : ''}
+                                <div class="flex justify-between items-center pt-2 border-t border-gray-100">
+                                    <a href="${articleUrl}" target="_blank" class="font-mono text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-900 transition-colors flex items-center gap-1">READ MORE &rarr;</a>
+                                    <button onclick="unsaveArticle(${story.id}); event.stopPropagation();" class="font-mono text-[9px] font-bold text-red-600 tracking-widest hover:text-red-800 transition-colors flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[14px]">delete</span> REMOVE
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+            
+            // 4. Render Sidebar Widget Content
+            const sidebarContainer = document.getElementById('sidebar-saved-items');
+            if (sidebarContainer) {
+                if (saved.length === 0) {
+                    sidebarContainer.innerHTML = `
+                        <div class="py-6 text-center font-mono text-[10px] text-gray-400 bg-alpha-cream border border-dashed border-gray-200">
+                            No saved articles.
+                        </div>
+                    `;
+                } else {
+                    const topItems = saved.slice(0, 3);
+                    sidebarContainer.innerHTML = topItems.map(story => {
+                        const articleUrl = getArticleUrl(story);
+                        const tag = story.tag || story.dealType || 'NEWS';
+                        return `
+                            <div class="pb-2 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors">
+                                <div class="flex justify-between text-[9px] font-mono text-gray-400 uppercase mb-1">
+                                    <span>${story.source}</span>
+                                    <span>${tag}</span>
+                                </div>
+                                <a href="${articleUrl}" target="_blank" class="font-sans font-semibold text-xs text-gray-900 hover:text-alpha-orange transition-colors line-clamp-2 leading-tight">
+                                    ${story.headline}
+                                </a>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+        }
+
+        function saveArticle(storyId) {
+            let foundStory = null;
+            for (const cat in ORIGINAL_STORIES) {
+                foundStory = ORIGINAL_STORIES[cat].find(s => s.id == storyId);
+                if (foundStory) break;
+            }
+            if (!foundStory) return;
+
+            let saved = loadSavedArticles();
+            if (!saved.some(s => s.id == storyId)) {
+                saved.unshift(foundStory);
+                localStorage.setItem('alpha-saved-stories', JSON.stringify(saved));
+                
+                showToast(`Article saved! <button onclick="toggleSavedDrawer(true); event.stopPropagation();" class="underline ml-2 text-alpha-orange font-bold hover:text-white transition-colors">VIEW LIST &rarr;</button>`);
+                updateSavedUI();
+                renderAllContent();
+
+                // Bounce/pop animation for the header badge
+                const badge = document.getElementById('saved-badge');
+                if (badge) {
+                    badge.classList.remove('scale-100');
+                    badge.classList.add('scale-125');
+                    setTimeout(() => {
+                        badge.classList.remove('scale-125');
+                        badge.classList.add('scale-100');
+                    }, 200);
+                }
+            } else {
+                showToast('Article is already saved!');
+            }
+        }
+
+        function unsaveArticle(storyId) {
+            let saved = loadSavedArticles().filter(s => s.id != storyId);
+            localStorage.setItem('alpha-saved-stories', JSON.stringify(saved));
+            showToast('Article removed!');
+            updateSavedUI();
+            renderAllContent();
+        }
+
+        function clearAllSaved() {
+            const saved = loadSavedArticles();
+            if (saved.length === 0) return;
+            if (confirm("Are you sure you want to clear all saved articles?")) {
+                localStorage.removeItem('alpha-saved-stories');
+                showToast('All saved articles cleared.');
+                updateSavedUI();
+                renderAllContent();
+            }
+        }
+
+        function renderTabs() {
+            const nav = document.getElementById('tab-nav');
+            nav.innerHTML = TABS.map((tab, i) => {
+                // Image 1 styling: upper case, gray text, orange border for active
+                const activeClass = i === 0
+                    ? 'text-gray-900 border-b-2 border-alpha-orange'
+                    : 'text-gray-400 border-b-2 border-transparent hover:text-gray-700';
+                return `<button class="${activeClass} font-sans text-xs font-bold tracking-widest uppercase py-4 transition-colors tab-btn" data-tab="${tab.id}" onclick="switchTab('${tab.id}')">${tab.label}</button>`;
+            }).join('');
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if (btn.dataset.tab === tabId) {
+                    btn.className = 'text-gray-900 border-b-2 border-alpha-orange font-sans text-xs font-bold tracking-widest uppercase py-4 transition-colors tab-btn';
+                } else {
+                    btn.className = 'text-gray-400 border-b-2 border-transparent hover:text-gray-700 font-sans text-xs font-bold tracking-widest uppercase py-4 transition-colors tab-btn';
+                }
+            });
+
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = content.id === `tab-${tabId}` ? 'block' : 'none';
+            });
+        }
+
+        function renderStoryCard(story, isLead, isSavedPage = false) {
+            if (isLead) {
+                // Layout from Image 2 (Rectangular Lead Story)
+                return `
         <article class="bg-alpha-cream border border-gray-200 shadow-sm p-8 mb-6 border-l-4 border-l-alpha-green cursor-pointer hover:shadow-md transition-shadow">
             <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center gap-2">
@@ -335,42 +612,55 @@ function renderStoryCard(story, isLead) {
             ${story.vc ? renderVCBlock(story.vc, true) : ''}
             
             <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-100">
-                <a href="${story.articleUrl || 'https://www.google.com/search?q=' + encodeURIComponent(story.headline + ' ' + story.source)}"  target="_blank" class="font-mono text-[10px] font-bold text-gray-400 tracking-widest hover:text-gray-900 transition-colors">READ MORE &rarr;</a>
-                <span class="font-mono text-[10px] text-gray-400 uppercase tracking-widest">${story.time || '7:00 AM'}</span>
+                <div class="flex items-center gap-4">
+                    <a href="${story.articleUrl || 'https://www.google.com/search?q=' + encodeURIComponent(story.headline + ' ' + story.source)}"  target="_blank" class="font-mono text-[10px] font-bold text-gray-400 tracking-widest hover:text-gray-900 transition-colors">READ MORE &rarr;</a>
+                    ${isSavedPage 
+                        ? `<button onclick="unsaveArticle(${story.id}); event.stopPropagation();" class="font-mono text-[10px] font-bold text-red-600 tracking-widest hover:text-red-800 transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_remove</span> REMOVE</button>`
+                        : `<button onclick="saveArticle(${story.id}); event.stopPropagation();" class="font-mono text-[10px] font-bold text-gray-400 tracking-widest hover:text-gray-900 transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_add</span> SAVE</button>`
+                    }
+                </div>
+                <span class="font-mono text-[10px] text-gray-400 uppercase tracking-widest">${formatTimeAgo(story.time) || '7:00 AM'}</span>
             </div>
         </article>
         `;
-    } else {
-        // Layout from Image 2 (Square Grid Story)
-        return `
-        <article class="bg-alpha-cream border border-gray-200 shadow-sm p-6 cursor-pointer hover:shadow-md transition-shadow flex flex-col h-full">
+            } else {
+                // Layout from Image 2 (Square Grid Story)
+                return `
+        <article class="bg-white border-0 p-6 cursor-pointer hover:bg-gray-50 transition-colors flex flex-col h-full aspect-square relative">
+            <div class="flex flex-col h-full justify-between">
+                <div>
             <div class="flex justify-between items-start mb-4">
-                <span class="font-mono text-[10px] font-bold text-alpha-orange tracking-widest uppercase break-words w-1/2">${story.tag || 'NEWS'}</span>
-                <span class="font-mono text-[9px] font-bold text-gray-400 tracking-widest uppercase text-right w-1/2 break-words">${story.source}</span>
+                <span class="font-mono text-[10px] font-bold text-gray-900 tracking-widest uppercase border border-gray-200 px-2 py-1">${story.tag || 'NEWS'}</span>
+                <span class="font-mono text-[9px] font-bold text-gray-400 tracking-widest uppercase text-right">${story.source}</span>
             </div>
             
-            <h3 class="font-serif text-[18px] font-bold text-gray-900 mb-2 leading-snug">
+            <h3 class="font-serif text-[18px] font-bold text-gray-900 mb-2 leading-snug line-clamp-3">
                 <a href="${story.articleUrl || 'https://www.google.com/search?q=' + encodeURIComponent(story.headline + ' ' + story.source)}"  target="_blank" class="hover:text-gray-600 transition-colors">${story.headline}</a>
             </h3>
             
-            ${story.subline ? `<p class="font-sans text-[12px] italic text-gray-500 mb-3 border-l-2 border-gray-200 pl-2">${story.subline}</p>` : ''}
+            ${story.subline ? `<p class="font-sans text-[12px] italic text-gray-500 mb-3 border-l-2 border-gray-200 pl-2 line-clamp-1">${story.subline}</p>` : ''}
             
-            <p class="font-sans text-[13px] text-gray-700 leading-relaxed mb-4 flex-grow">${story.body}</p>
+            <p class="font-sans text-[13px] text-gray-600 leading-relaxed mb-4 line-clamp-3">${story.body}</p>
             
             ${story.vc ? renderVCBlock(story.vc, false) : ''}
+            </div>
             
-            <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
-                <a href="${story.articleUrl || 'https://www.google.com/search?q=' + encodeURIComponent(story.headline + ' ' + story.source)}"  target="_blank" class="font-mono text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-900 transition-colors">READ MORE &rarr;</a>
-                <span class="font-mono text-[9px] text-gray-400 uppercase tracking-widest">${story.time || '8:00 AM'}</span>
+            <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
+                ${isSavedPage 
+                    ? `<button onclick="unsaveArticle(${story.id}); event.stopPropagation();" class="font-mono text-[9px] font-bold text-red-600 tracking-widest hover:text-red-800 transition-colors uppercase flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_remove</span> REMOVE</button>`
+                    : `<button onclick="saveArticle(${story.id}); event.stopPropagation();" class="font-mono text-[9px] font-bold text-gray-900 tracking-widest hover:text-gray-500 transition-colors uppercase flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_add</span> SAVE</button>`
+                }
+                <span class="font-mono text-[9px] text-gray-400 uppercase tracking-widest">${formatTimeAgo(story.time) || '8:00 AM'}</span>
+            </div>
             </div>
         </article>
         `;
-    }
-}
+            }
+        }
 
-function renderVCBlock(vc, isLead) {
-    const ts = isLead ? 'text-[12px]' : 'text-[10px]';
-    return `
+        function renderVCBlock(vc, isLead) {
+            const ts = isLead ? 'text-[12px]' : 'text-[10px]';
+            return `
         <div class="bg-gray-50 p-3 mb-4 rounded-sm border border-gray-200">
             <div class="grid grid-cols-2 gap-y-1">
                 <div class="font-sans ${ts} text-gray-500">Stage</div><div class="font-sans ${ts} font-medium text-right">${vc.stage}</div>
@@ -379,25 +669,25 @@ function renderVCBlock(vc, isLead) {
             </div>
         </div>
     `;
-}
+        }
 
-function renderDealCard(deal, isLead) {
-    // Deal cards adapted to the rectangular/square layout aesthetic
-    const statusColor = (deal.dealStatus || '').toLowerCase() === 'completed' ? 'text-alpha-green' : 'text-gray-900';
-    
-    let metricsHtml = '';
-    if (deal.metrics) {
-        const rows = Object.entries(deal.metrics).map(([k, v]) => `
+        function renderDealCard(deal, isLead, isSavedPage = false) {
+            // Deal cards adapted to the rectangular/square layout aesthetic
+            const statusColor = (deal.dealStatus || '').toLowerCase() === 'completed' ? 'text-alpha-green' : 'text-gray-900';
+
+            let metricsHtml = '';
+            if (deal.metrics) {
+                const rows = Object.entries(deal.metrics).map(([k, v]) => `
             <div class="flex flex-col border border-gray-200 p-2 bg-gray-50">
                 <span class="font-mono text-[9px] text-gray-500 uppercase font-bold tracking-wider">${k.replace(/([A-Z])/g, ' $1').trim()}</span>
                 <span class="font-mono text-[12px] font-semibold text-gray-900">${v}</span>
             </div>
         `).join('');
-        metricsHtml = `<div class="grid grid-cols-2 ${isLead ? 'md:grid-cols-4' : ''} gap-2 mb-4">${rows}</div>`;
-    }
+                metricsHtml = `<div class="grid grid-cols-2 ${isLead ? 'md:grid-cols-4' : ''} gap-2 mb-4">${rows}</div>`;
+            }
 
-    if (isLead) {
-        return `
+            if (isLead) {
+                return `
         <article class="bg-alpha-cream border border-gray-200 shadow-sm p-8 mb-6 border-l-4 border-l-alpha-green cursor-pointer hover:shadow-md transition-shadow">
             <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
                 <div class="flex items-center gap-2">
@@ -430,15 +720,23 @@ function renderDealCard(deal, isLead) {
                     ${deal.advisors && deal.advisors.sell !== 'N/A' ? `<div><span class="font-semibold text-gray-800">Sell-side:</span> ${deal.advisors.sell}</div>` : ''}
                 </div>
                 <div class="flex flex-col items-end gap-2">
-                    <a href="${getArticleUrl(deal)}" target="_blank" class="font-mono text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-900 transition-colors">DETAILS &rarr;</a>
-                    <span class="font-mono text-[10px] text-gray-400 uppercase tracking-widest">${deal.time || '9:00 AM'}</span>
+                    <div class="flex items-center gap-3">
+                        <a href="${getArticleUrl(deal)}" target="_blank" class="font-mono text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-900 transition-colors">DETAILS &rarr;</a>
+                        ${isSavedPage 
+                            ? `<button onclick="unsaveArticle(${deal.id}); event.stopPropagation();" class="font-mono text-[9px] font-bold text-red-600 tracking-widest hover:text-red-800 transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_remove</span> REMOVE</button>`
+                            : `<button onclick="saveArticle(${deal.id}); event.stopPropagation();" class="font-mono text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-500 transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_add</span> SAVE</button>`
+                        }
+                    </div>
+                    <span class="font-mono text-[10px] text-gray-400 uppercase tracking-widest">${formatTimeAgo(deal.time) || '9:00 AM'}</span>
                 </div>
             </div>
         </article>
         `;
-    } else {
-        return `
-        <article class="bg-alpha-cream border border-gray-200 shadow-sm p-6 cursor-pointer hover:shadow-md transition-shadow flex flex-col h-full">
+            } else {
+                return `
+        <article class="bg-white border-0 p-6 cursor-pointer hover:bg-gray-50 transition-colors flex flex-col h-full aspect-square relative">
+            <div class="flex flex-col h-full justify-between">
+                <div>
             <div class="flex justify-between items-center mb-3 border-b border-gray-100 pb-2">
                 <span class="font-mono text-[9px] font-bold text-alpha-orange tracking-widest uppercase">${deal.dealType || 'M&A'}</span>
                 <span class="font-mono text-[9px] font-bold ${statusColor} tracking-widest uppercase">${deal.dealStatus || 'Announced'}</span>
@@ -464,224 +762,257 @@ function renderDealCard(deal, isLead) {
                     ${deal.advisors && deal.advisors.sell !== 'N/A' ? `<div class="truncate"><span class="font-semibold text-gray-700">Sell:</span> ${deal.advisors.sell}</div>` : ''}
                 </div>
                 <div class="flex justify-between items-center">
-                    <a href="${getArticleUrl(deal)}" target="_blank" class="font-mono text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-900 transition-colors">DETAILS &rarr;</a>
-                    <span class="font-mono text-[9px] text-gray-400 uppercase tracking-widest">${deal.time || '10:00 AM'}</span>
+                    <div class="flex items-center gap-3">
+                        <a href="${getArticleUrl(deal)}" target="_blank" class="font-mono text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-900 transition-colors">DETAILS &rarr;</a>
+                        ${isSavedPage 
+                            ? `<button onclick="unsaveArticle(${deal.id}); event.stopPropagation();" class="font-mono text-[9px] font-bold text-red-600 tracking-widest hover:text-red-800 transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_remove</span> REMOVE</button>`
+                            : `<button onclick="saveArticle(${deal.id}); event.stopPropagation();" class="font-mono text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-500 transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">bookmark_add</span> SAVE</button>`
+                        }
+                    </div>
+                    <span class="font-mono text-[9px] text-gray-400 uppercase tracking-widest">${formatTimeAgo(deal.time) || '10:00 AM'}</span>
                 </div>
             </div>
         </article>
         `;
-    }
-}
+            }
+        }
 
-function renderTabContent(tabConfig) {
-    const stories = STORIES[tabConfig.id] || [];
-    if (stories.length === 0) {
-        return `<div class="tab-content" id="tab-${tabConfig.id}">
+        function renderTabContent(tabConfig) {
+            let stories = [];
+            const isSavedTab = tabConfig.id === 'saved-articles';
+            if (isSavedTab) {
+                stories = loadSavedArticles();
+            } else {
+                stories = STORIES[tabConfig.id] || [];
+            }
+
+            if (stories.length === 0) {
+                if (isSavedTab) {
+                    return `<div class="tab-content" id="tab-saved-articles">
+                        <div class="flex flex-col items-center justify-center py-20 bg-alpha-cream border border-dashed border-gray-300">
+                            <span class="material-symbols-outlined text-gray-300 text-4xl mb-3 font-light">bookmark</span>
+                            <p class="font-mono text-[11px] text-gray-500 uppercase tracking-widest font-bold">No saved articles</p>
+                            <p class="font-sans text-[13px] text-gray-400 mt-2">Articles you save will appear here for offline reading.</p>
+                        </div>
+                    </div>`;
+                }
+                return `<div class="tab-content" id="tab-${tabConfig.id}">
             <div class="flex flex-col items-center justify-center py-20 bg-alpha-cream border border-dashed border-gray-300">
                 <span class="material-symbols-outlined text-gray-300 text-4xl mb-3">article</span>
                 <p class="font-mono text-[11px] text-gray-500 uppercase tracking-widest font-bold">No intelligence available</p>
                 <p class="font-sans text-[13px] text-gray-400 mt-2">There are currently no stories indexed for ${tabConfig.label}.</p>
             </div>
         </div>`;
-    }
-    
-    // Sort to put lead stories first
-    const sorted = [...stories].sort((a, b) => (b.lead ? 1 : 0) - (a.lead ? 1 : 0));
-    const isDealsTab = tabConfig.id === 'ib-transactions';
-    
-    let html = `<div class="tab-content" id="tab-${tabConfig.id}">`;
-    
-    // Render Lead Story (First item)
-    if (sorted.length > 0) {
-        html += isDealsTab ? renderDealCard(sorted[0], true) : renderStoryCard(sorted[0], true);
-    }
-    
-    // Render Grid Stories (Remaining items)
-    if (sorted.length > 1) {
-        html += `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
-        for (let i = 1; i < sorted.length; i++) {
-            html += isDealsTab ? renderDealCard(sorted[i], false) : renderStoryCard(sorted[i], false);
+            }
+
+            // Chronological order is handled directly by the API response
+            const sorted = stories;
+            const isDealsTab = tabConfig.id === 'ib-transactions';
+
+            let html = `<div class="tab-content" id="tab-${tabConfig.id}">`;
+
+            // Render Lead Story (First item)
+            if (sorted.length > 0) {
+                html += isDealsTab 
+                    ? renderDealCard(sorted[0], true, isSavedTab) 
+                    : renderStoryCard(sorted[0], true, isSavedTab);
+            }
+
+            // Render Grid Stories (Remaining items - max 6, except for saved tab which lists all)
+            if (sorted.length > 1) {
+                html += `<div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-gray-200 border border-gray-200">`;
+                const gridItems = sorted.slice(1);
+                const displayItems = isSavedTab ? gridItems : gridItems.slice(0, 6);
+                for (let i = 0; i < displayItems.length; i++) {
+                    html += `<div class="bg-white">`;
+                    html += isDealsTab 
+                        ? renderDealCard(displayItems[i], false, isSavedTab) 
+                        : renderStoryCard(displayItems[i], false, isSavedTab);
+                    html += `</div>`;
+                }
+                html += `</div>`;
+            }
+
+            html += `</div>`;
+            return html;
         }
-        html += `</div>`;
-    }
-    
-    html += `</div>`;
-    return html;
-}
 
-function renderAllContent() {
-    const area = document.getElementById('content-area');
-    area.innerHTML = TABS.map(tab => renderTabContent(tab)).join('');
-    
-    // Hide all except first
-    document.querySelectorAll('.tab-content').forEach((content, i) => {
-        if (i !== 0) content.style.display = 'none';
-    });
+        function renderAllContent() {
+            const area = document.getElementById('content-area');
+            area.innerHTML = TABS.map(tab => renderTabContent(tab)).join('');
 
-    // Re-apply active tab if one was selected
-    const activeBtn = document.querySelector('.tab-btn.text-gray-900');
-    if (activeBtn) {
-        switchTab(activeBtn.dataset.tab);
-    }
-}
+            // Hide all except first
+            document.querySelectorAll('.tab-content').forEach((content, i) => {
+                if (i !== 0) content.style.display = 'none';
+            });
 
-function renderTicker() {
-    const tickerData = [
-        { label: 'S&P 500', value: '5,234.12', change: '+0.45%', dir: 'up' },
-        { label: 'NASDAQ', value: '16,428.82', change: '+0.82%', dir: 'up' },
-        { label: 'NIFTY', value: '23,547.75', change: '-1.50%', dir: 'down', id: 'ticker-nifty-val' },
-        { label: 'SENSEX', value: '74,775.74', change: '-1.44%', dir: 'down', id: 'ticker-sensex-val' },
-        { label: 'USD/JPY', value: '151.34', change: '+0.12%', dir: 'up' },
-        { label: 'GOLD', value: '₹1,56,463', change: '+1.47%', dir: 'up' },
-        { label: 'WTI CRUDE', value: '$81.35', change: '-0.48%', dir: 'down' },
-        { label: 'BRENT', value: '$91.70', change: '-0.8%', dir: 'down' },
-    ];
-    
-    const items = tickerData.map(d => {
-        const colorClass = d.dir === 'up' ? 'text-green-600' : 'text-red-600';
-        const arrow = d.dir === 'up' ? '▲' : '▼';
-        const idStr = d.id ? ` id="${d.id}"` : '';
-        return `<span class="flex items-center gap-2 font-mono text-[11px] font-bold mr-12"><span class="text-gray-800">${d.label}</span> <span class="${colorClass}"${idStr}>${arrow} ${d.value} (${d.change})</span></span>`;
-    }).join('');
-    
-    document.getElementById('ticker-track').innerHTML = `<div class="flex px-8 items-center">${items}</div><div class="flex px-8 items-center">${items}</div>`;
-}
+            // Re-apply active tab if one was selected
+            const activeBtn = document.querySelector('.tab-btn.text-gray-900');
+            if (activeBtn) {
+                switchTab(activeBtn.dataset.tab);
+            }
+        }
 
-// ==================== LIVE MARKET DATA ENGINE ====================
-const MARKET_DATA = {
-    nifty:   { base: 23755.20, prev: 23907.15, fmt: v => v.toLocaleString('en-IN', { maximumFractionDigits: 2 }), el: 'nifty-val',  chgEl: 'nifty-chg',  kind: 'index',     yahoo: '%5ENSEI' },
-    sensex:  { base: 75200.10, prev: 75867.80, fmt: v => v.toLocaleString('en-IN', { maximumFractionDigits: 2 }), el: 'sensex-val', chgEl: 'sensex-chg', kind: 'index',     yahoo: '%5EBSESN' },
-    usdinr:  { base: 84.85,    prev: 84.50,    fmt: v => '₹' + v.toFixed(2),          el: 'usdinr-val', chgEl: 'usdinr-chg', kind: 'fx',        yahoo: 'USDINR%3DX' },
-    gold:    { base: 158200,   prev: 154200,   fmt: v => '₹' + v.toLocaleString('en-IN', { maximumFractionDigits: 0 }), el: 'gold-val', chgEl: 'gold-chg', kind: 'commodity', yahoo: 'GC%3DF' },
-    us10y:   { base: 4.38,     prev: 4.38,     fmt: v => v.toFixed(2) + '%',          el: 'us10y-val', chgEl: 'us10y-chg', kind: 'yield',     yahoo: '%5ETNX', bps: true },
-    in10y:   { base: 7.02,     prev: 7.04,     fmt: v => v.toFixed(2) + '%',          el: 'in10y-val', chgEl: 'in10y-chg', kind: 'yield',     bps: true },
-    spread:  { base: 255,      prev: 266,      fmt: v => Math.round(v) + ' bps',      el: 'spread-val', chgEl: 'spread-chg', kind: 'spread',   bps: true },
-};
-const MARKET_LIVE = {};
-Object.keys(MARKET_DATA).forEach(k => { MARKET_LIVE[k] = MARKET_DATA[k].base; });
+        function renderTicker() {
+            const tickerData = [
+                { label: 'S&P 500', value: '5,234.12', change: '+0.45%', dir: 'up' },
+                { label: 'NASDAQ', value: '16,428.82', change: '+0.82%', dir: 'up' },
+                { label: 'NIFTY', value: '23,547.75', change: '-1.50%', dir: 'down', id: 'ticker-nifty-val' },
+                { label: 'SENSEX', value: '74,775.74', change: '-1.44%', dir: 'down', id: 'ticker-sensex-val' },
+                { label: 'USD/JPY', value: '151.34', change: '+0.12%', dir: 'up' },
+                { label: 'GOLD', value: '₹1,56,463', change: '+1.47%', dir: 'up' },
+                { label: 'WTI CRUDE', value: '$81.35', change: '-0.48%', dir: 'down' },
+                { label: 'BRENT', value: '$91.70', change: '-0.8%', dir: 'down' },
+            ];
 
-const YF_SYMBOLS = {
-    nifty:  '^NSEI',
-    sensex: '^BSESN',
-    usdinr: 'USDINR=X',
-    gold:   'GC=F',
-    us10y:  '^TNX',
-};
+            const items = tickerData.map(d => {
+                const colorClass = d.dir === 'up' ? 'text-green-600' : 'text-red-600';
+                const textClass = 'text-gray-900';
+                const arrow = d.dir === 'up' ? '▲' : '▼';
+                const idStr = d.id ? ` id="${d.id}"` : '';
+                return `<span class="flex items-center gap-2 font-mono text-[11px] font-bold mr-12"><span class="text-gray-900">${d.label}</span> <span class="${colorClass}"${idStr}>${arrow} ${d.value} (${d.change})</span></span>`;
+            }).join('');
 
-async function fetchYahooQuote(symbol) {
-    const url = `/api/market-data?symbol=${encodeURIComponent(symbol)}`;
-    try {
-        const res = await fetch(url);
-        if (!res.ok) return null;
-        const data = await res.json();
-        return {
-            price: data.price,
-            prev:  data.prev,
-            open:  data.open,
+            document.getElementById('ticker-track').innerHTML = `<div class="flex px-8 items-center">${items}</div><div class="flex px-8 items-center">${items}</div>`;
+        }
+
+        // ==================== LIVE MARKET DATA ENGINE ====================
+        const MARKET_DATA = {
+            nifty: { base: 23755.20, prev: 23907.15, fmt: v => v.toLocaleString('en-IN', { maximumFractionDigits: 2 }), el: 'nifty-val', chgEl: 'nifty-chg', kind: 'index', yahoo: '%5ENSEI' },
+            sensex: { base: 75200.10, prev: 75867.80, fmt: v => v.toLocaleString('en-IN', { maximumFractionDigits: 2 }), el: 'sensex-val', chgEl: 'sensex-chg', kind: 'index', yahoo: '%5EBSESN' },
+            usdinr: { base: 84.85, prev: 84.50, fmt: v => '₹' + v.toFixed(2), el: 'usdinr-val', chgEl: 'usdinr-chg', kind: 'fx', yahoo: 'USDINR%3DX' },
+            gold: { base: 158200, prev: 154200, fmt: v => '₹' + v.toLocaleString('en-IN', { maximumFractionDigits: 0 }), el: 'gold-val', chgEl: 'gold-chg', kind: 'commodity', yahoo: 'GC%3DF' },
+            us10y: { base: 4.38, prev: 4.38, fmt: v => v.toFixed(2) + '%', el: 'us10y-val', chgEl: 'us10y-chg', kind: 'yield', yahoo: '%5ETNX', bps: true },
+            in10y: { base: 7.02, prev: 7.04, fmt: v => v.toFixed(2) + '%', el: 'in10y-val', chgEl: 'in10y-chg', kind: 'yield', bps: true },
+            spread: { base: 255, prev: 266, fmt: v => Math.round(v) + ' bps', el: 'spread-val', chgEl: 'spread-chg', kind: 'spread', bps: true },
+            reporate: { base: 6.50, prev: 6.50, fmt: v => v.toFixed(2) + '%', el: 'reporate-val', chgEl: 'reporate-chg', kind: 'yield', bps: true },
+            fedrate: { base: 5.50, prev: 5.50, fmt: v => v.toFixed(2) + '%', el: 'fedrate-val', chgEl: 'fedrate-chg', kind: 'yield', bps: true },
         };
-    } catch (e) {
-        return null;
-    }
-}
+        const MARKET_LIVE = {};
+        Object.keys(MARKET_DATA).forEach(k => { MARKET_LIVE[k] = MARKET_DATA[k].base; });
 
-async function fetchAllLiveMarketData() {
-    const fetches = Object.entries(YF_SYMBOLS).map(async ([key, sym]) => {
-        const data = await fetchYahooQuote(sym);
-        if (data && data.price) {
-            MARKET_LIVE[key] = data.price;
-            MARKET_DATA[key].prev = data.prev;
+        const YF_SYMBOLS = {
+            nifty: '^NSEI',
+            sensex: '^BSESN',
+            usdinr: 'USDINR=X',
+            gold: 'GC=F',
+            us10y: '^TNX',
+        };
+
+        async function fetchYahooQuote(symbol) {
+            const url = `/api/market-data?symbol=${encodeURIComponent(symbol)}`;
+            try {
+                const res = await fetch(url);
+                if (!res.ok) return null;
+                const data = await res.json();
+                return {
+                    price: data.price,
+                    prev: data.prev,
+                    open: data.open,
+                };
+            } catch (e) {
+                return null;
+            }
         }
-    });
-    await Promise.all(fetches);
 
-    if (MARKET_LIVE['in10y'] && MARKET_LIVE['us10y']) {
-        MARKET_LIVE['spread'] = (MARKET_LIVE['in10y'] - MARKET_LIVE['us10y']) * 100;
-    }
+        async function fetchAllLiveMarketData() {
+            const fetches = Object.entries(YF_SYMBOLS).map(async ([key, sym]) => {
+                const data = await fetchYahooQuote(sym);
+                if (data && data.price) {
+                    MARKET_LIVE[key] = data.price;
+                    MARKET_DATA[key].prev = data.prev;
+                }
+            });
+            await Promise.all(fetches);
 
-    Object.keys(MARKET_DATA).forEach(k => renderMarketWidgetValue(k));
-}
+            if (MARKET_LIVE['in10y'] && MARKET_LIVE['us10y']) {
+                MARKET_LIVE['spread'] = (MARKET_LIVE['in10y'] - MARKET_LIVE['us10y']) * 100;
+            }
 
-function nudge(val, kind) {
-    let pct;
-    if (kind === 'yield') pct = (Math.random() - 0.5) * 0.002;
-    else if (kind === 'fx') pct = (Math.random() - 0.5) * 0.0003;
-    else if (kind === 'spread') return val + (Math.random() - 0.5) * 0.5;
-    else pct = (Math.random() - 0.5) * 0.0015;
-    return val * (1 + pct);
-}
+            Object.keys(MARKET_DATA).forEach(k => renderMarketWidgetValue(k));
+        }
 
-function renderMarketWidgetValue(key) {
-    const cfg = MARKET_DATA[key];
-    const val = MARKET_LIVE[key];
-    const prev = cfg.prev || cfg.base;
+        function nudge(val, kind) {
+            let pct;
+            if (kind === 'yield') pct = (Math.random() - 0.5) * 0.002;
+            else if (kind === 'fx') pct = (Math.random() - 0.5) * 0.0003;
+            else if (kind === 'spread') return val + (Math.random() - 0.5) * 0.5;
+            else pct = (Math.random() - 0.5) * 0.0015;
+            return val * (1 + pct);
+        }
 
-    const diff = val - prev;
-    const direction = diff >= 0 ? 'up' : 'down';
-    const arrow = direction === 'up' ? '▲' : '▼';
+        function renderMarketWidgetValue(key) {
+            const cfg = MARKET_DATA[key];
+            const val = MARKET_LIVE[key];
+            const prev = cfg.prev || cfg.base;
 
-    const valEl = document.getElementById(cfg.el);
-    const chgEl = document.getElementById(cfg.chgEl);
-    if (!valEl || !chgEl) return;
+            const diff = val - prev;
+            const direction = diff >= 0 ? 'up' : 'down';
+            const arrow = direction === 'up' ? '▲' : '▼';
 
-    valEl.textContent = cfg.fmt(val);
+            const valEl = document.getElementById(cfg.el);
+            const chgEl = document.getElementById(cfg.chgEl);
+            if (!valEl || !chgEl) return;
 
-    if (cfg.bps) {
-        const bpsDiff = Math.abs(Math.round(diff * (cfg.kind === 'spread' ? 1 : 100)));
-        chgEl.textContent = `${arrow} ${direction === 'up' ? '+' : '−'}${bpsDiff} bps`;
-    } else {
-        const pct = (diff / prev) * 100;
-        chgEl.textContent = `${arrow} ${direction === 'up' ? '+' : ''}${pct.toFixed(2)}%`;
-    }
-    
-    const colorClass = direction === 'up' ? 'text-green-600' : 'text-red-600';
-    chgEl.className = `font-mono text-[10px] ${colorClass}`;
-}
+            valEl.textContent = cfg.fmt(val);
 
-function updateMarketWidget(key) {
-    const cfg = MARKET_DATA[key];
-    const oldVal = MARKET_LIVE[key];
-    let newVal;
-    if (cfg.kind === 'spread') {
-        newVal = (MARKET_LIVE['in10y'] - MARKET_LIVE['us10y']) * 100;
-    } else {
-        newVal = nudge(oldVal, cfg.kind);
-    }
-    MARKET_LIVE[key] = newVal;
+            if (cfg.bps) {
+                const bpsDiff = Math.abs(Math.round(diff * (cfg.kind === 'spread' ? 1 : 100)));
+                chgEl.textContent = `${arrow} ${direction === 'up' ? '+' : '−'}${bpsDiff} bps`;
+            } else {
+                const pct = (diff / prev) * 100;
+                chgEl.textContent = `${arrow} ${direction === 'up' ? '+' : ''}${pct.toFixed(2)}%`;
+            }
 
-    renderMarketWidgetValue(key);
-}
+            const colorClass = direction === 'up' ? 'text-green-600' : 'text-red-600';
+            chgEl.className = `font-mono text-[10px] ${colorClass}`;
+        }
 
-function tickMarket() {
-    Object.keys(MARKET_DATA).forEach(k => updateMarketWidget(k));
-}
+        function updateMarketWidget(key) {
+            const cfg = MARKET_DATA[key];
+            const oldVal = MARKET_LIVE[key];
+            let newVal;
+            if (cfg.kind === 'spread') {
+                newVal = (MARKET_LIVE['in10y'] - MARKET_LIVE['us10y']) * 100;
+            } else {
+                newVal = nudge(oldVal, cfg.kind);
+            }
+            MARKET_LIVE[key] = newVal;
 
-// ==================== WATCHLIST ====================
-function loadWatchlist() {
-    try { return JSON.parse(localStorage.getItem('alpha-watchlist') || '[]'); }
-    catch (e) { return []; }
-}
-function saveWatchlist(list) {
-    localStorage.setItem('alpha-watchlist', JSON.stringify(list));
-}
+            renderMarketWidgetValue(key);
+        }
 
-function renderWatchlist() {
-    const list = loadWatchlist();
-    const container = document.getElementById('watchlist-items');
-    if (!container) return;
+        function tickMarket() {
+            Object.keys(MARKET_DATA).forEach(k => updateMarketWidget(k));
+        }
 
-    if (list.length === 0) {
-        container.innerHTML = `<div class="p-4 text-center font-mono text-[10px] text-gray-500 bg-alpha-cream">No tickers tracked. Add one above.</div>`;
-        return;
-    }
+        // ==================== WATCHLIST ====================
+        function loadWatchlist() {
+            try { return JSON.parse(localStorage.getItem('alpha-watchlist') || '[]'); }
+            catch (e) { return []; }
+        }
+        function saveWatchlist(list) {
+            localStorage.setItem('alpha-watchlist', JSON.stringify(list));
+        }
 
-    container.innerHTML = list.map(sym => {
-        const seed = sym.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-        const price = (100 + (seed % 900)).toFixed(2);
-        const change = (((seed % 20) - 10) / 10).toFixed(2);
-        const isUp = parseFloat(change) >= 0;
-        const color = isUp ? 'text-green-600' : 'text-red-600';
-        const arrow = isUp ? '▲' : '▼';
-        return `
+        function renderWatchlist() {
+            const list = loadWatchlist();
+            const container = document.getElementById('watchlist-items');
+            if (!container) return;
+
+            if (list.length === 0) {
+                container.innerHTML = `<div class="p-4 text-center font-mono text-[10px] text-gray-500 bg-alpha-cream">No tickers tracked. Add one above.</div>`;
+                return;
+            }
+
+            container.innerHTML = list.map(sym => {
+                const seed = sym.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+                const price = (100 + (seed % 900)).toFixed(2);
+                const change = (((seed % 20) - 10) / 10).toFixed(2);
+                const isUp = parseFloat(change) >= 0;
+                const color = isUp ? 'text-green-600' : 'text-red-600';
+                const arrow = isUp ? '▲' : '▼';
+                return `
             <div class="flex justify-between items-center p-3 bg-alpha-cream" id="wl-${sym}">
                 <div>
                     <div class="font-mono text-[11px] font-bold text-gray-800">${sym}</div>
@@ -692,162 +1023,185 @@ function renderWatchlist() {
                     <button onclick="removeWatchlistItem('${sym}')" class="material-symbols-outlined text-[14px] text-gray-300 hover:text-red-500 transition-colors">close</button>
                 </div>
             </div>`;
-    }).join('');
-}
-
-function addWatchlistItem() {
-    const input = document.getElementById('watchlist-input');
-    const sym = (input.value || '').trim().toUpperCase();
-    if (!sym) return;
-    const list = loadWatchlist();
-    if (!list.includes(sym) && list.length < 10) {
-        list.push(sym);
-        saveWatchlist(list);
-        renderWatchlist();
-    }
-    input.value = '';
-}
-
-function removeWatchlistItem(sym) {
-    const list = loadWatchlist().filter(s => s !== sym);
-    saveWatchlist(list);
-    renderWatchlist();
-}
-
-
-function handleSearch() {
-    const q = document.getElementById('search-input').value.toLowerCase();
-    
-    // Reset stories
-    STORIES = JSON.parse(JSON.stringify(ORIGINAL_STORIES));
-    
-    if (q) {
-        for (const cat in STORIES) {
-            STORIES[cat] = STORIES[cat].filter(s => 
-                (s.headline && s.headline.toLowerCase().includes(q)) || 
-                (s.body && s.body.toLowerCase().includes(q)) ||
-                (s.tag && s.tag.toLowerCase().includes(q))
-            );
+            }).join('');
         }
-    }
-    renderAllContent();
-}
 
-async function handleSubscribePopup(e) {
-    e.preventDefault();
-    const emailInput = document.getElementById('popup-email');
-    const btn = document.getElementById('popup-sub-btn');
-    const msg = document.getElementById('popup-msg');
-    const email = emailInput.value.trim();
-    
-    if (!email) return;
-    
-    btn.textContent = "Verifying...";
-    btn.disabled = true;
-    msg.textContent = "";
-    
-    try {
-        const res = await fetch('/subscribe', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
-        });
-        const data = await res.json();
-        
-        if (res.ok) {
-            msg.textContent = "Access Granted!";
-            msg.className = "font-mono text-xs mt-4 h-4 text-green-600";
-            setTimeout(() => {
-                document.getElementById('welcome-modal').classList.add('hidden');
-                // Optionally save to localStorage so it doesn't pop up again
-                localStorage.setItem('alpha-access', 'true');
-            }, 800);
-        } else {
-            msg.textContent = data.error || "Failed.";
-            msg.className = "font-mono text-xs mt-4 h-4 text-red-600";
-            btn.textContent = "Get Access Now";
-            btn.disabled = false;
+        function addWatchlistItem() {
+            const input = document.getElementById('watchlist-input');
+            const sym = (input.value || '').trim().toUpperCase();
+            if (!sym) return;
+            const list = loadWatchlist();
+            if (!list.includes(sym) && list.length < 10) {
+                list.push(sym);
+                saveWatchlist(list);
+                renderWatchlist();
+            }
+            input.value = '';
         }
-    } catch (err) {
-        msg.textContent = "Network error.";
-        msg.className = "font-mono text-xs mt-4 h-4 text-red-600";
-        btn.textContent = "Get Access Now";
-        btn.disabled = false;
-    }
-}
 
-async function fetchStories() {
-    try {
-        const res = await fetch('/api/stories?_t=' + new Date().getTime(), { cache: 'no-store' });
-        if (res.ok) {
-            STORIES = await res.json();
-            ORIGINAL_STORIES = JSON.parse(JSON.stringify(STORIES));
+        function removeWatchlistItem(sym) {
+            const list = loadWatchlist().filter(s => s !== sym);
+            saveWatchlist(list);
+            renderWatchlist();
+        }
+
+
+        function handleSearch() {
+            const q = document.getElementById('search-input').value.toLowerCase();
+
+            // Reset stories
+            STORIES = JSON.parse(JSON.stringify(ORIGINAL_STORIES));
+
+            if (q) {
+                for (const cat in STORIES) {
+                    STORIES[cat] = STORIES[cat].filter(s =>
+                        (s.headline && s.headline.toLowerCase().includes(q)) ||
+                        (s.body && s.body.toLowerCase().includes(q)) ||
+                        (s.tag && s.tag.toLowerCase().includes(q))
+                    );
+                }
+            }
             renderAllContent();
         }
-    } catch (e) {
-        console.error("Failed to load stories", e);
-    }
-}
 
-function getArticleUrl(story) {
-    if (story.articleUrl) return story.articleUrl;
-    return '#';
-}
+        async function handleSubscribePopup(e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('popup-email');
+            const btn = document.getElementById('popup-sub-btn');
+            const msg = document.getElementById('popup-msg');
+            const email = emailInput.value.trim();
 
-function init() {
-    renderTabs();
-    fetchStories();
-    renderTicker();
-    renderWatchlist();
-    
-    Object.keys(MARKET_DATA).forEach(k => renderMarketWidgetValue(k));
-    fetchAllLiveMarketData();
-    // Intervals removed to make market data static
-    
-    window.addWatchlistItem = addWatchlistItem;
-    window.removeWatchlistItem = removeWatchlistItem;
+            if (!email) return;
 
-    // Show popup if not already subscribed
-    if (!localStorage.getItem('alpha-access')) {
-        document.getElementById('welcome-modal').classList.remove('hidden');
-    }
-}
+            btn.textContent = "Verifying...";
+            btn.disabled = true;
+            msg.textContent = "";
 
-document.addEventListener('DOMContentLoaded', init);
-async function handleSubscribe() {
-    const emailInput = document.getElementById('subscribe-email');
-    const msg = document.getElementById('subscribe-msg');
-    const email = emailInput.value.trim();
-    
-    if (!email || !email.includes('@')) {
-        msg.textContent = "Please enter a valid email.";
-        msg.style.color = "#dc2626";
-        msg.classList.remove('hidden');
-        return;
-    }
-    
-    msg.textContent = "Subscribing...";
-    msg.style.color = "#059669";
-    msg.classList.remove('hidden');
-    
-    try {
-        const res = await fetch('/subscribe', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
-        });
-        const data = await res.json();
-        
-        msg.textContent = data.message || data.error;
-        if(res.ok) {
-            emailInput.value = '';
-        } else {
-            msg.style.color = "#dc2626";
+            try {
+                const res = await fetch('/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    msg.textContent = "Access Granted!";
+                    msg.className = "font-mono text-xs mt-4 h-4 text-green-600";
+                    setTimeout(() => {
+                        document.getElementById('welcome-modal').classList.add('hidden');
+                        // Optionally save to localStorage so it doesn't pop up again
+                        localStorage.setItem('alpha-access', 'true');
+                    }, 800);
+                } else {
+                    msg.textContent = data.error || "Failed.";
+                    msg.className = "font-mono text-xs mt-4 h-4 text-red-600";
+                    btn.textContent = "Get Access Now";
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                msg.textContent = "Network error.";
+                msg.className = "font-mono text-xs mt-4 h-4 text-red-600";
+                btn.textContent = "Get Access Now";
+                btn.disabled = false;
+            }
         }
-    } catch (e) {
-        msg.textContent = "Server error. Please try again.";
-        msg.style.color = "#dc2626";
-    }
-}
-</script>
-</body></html>
+
+        async function fetchStories() {
+            try {
+                const res = await fetch('/api/stories?_t=' + new Date().getTime(), { cache: 'no-store' });
+                if (res.ok) {
+                    STORIES = await res.json();
+                    ORIGINAL_STORIES = JSON.parse(JSON.stringify(STORIES));
+                    renderAllContent();
+                }
+            } catch (e) {
+                console.error("Failed to load stories", e);
+            }
+        }
+
+        function getArticleUrl(story) {
+            if (story.articleUrl) return story.articleUrl;
+            return '#';
+        }
+
+        function updateCurrentDate() {
+            const dateEl = document.getElementById('current-date');
+            if (dateEl) {
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                const today = new Date();
+                dateEl.textContent = today.toLocaleDateString('en-US', options).toUpperCase();
+            }
+        }
+
+        function init() {
+            updateCurrentDate();
+            renderTabs();
+            fetchStories();
+            renderTicker();
+            renderWatchlist();
+            updateSavedUI(); // Initialize saved badge and layouts
+
+            Object.keys(MARKET_DATA).forEach(k => renderMarketWidgetValue(k));
+            fetchAllLiveMarketData();
+            
+            // Re-enabled live market updates
+            setInterval(tickMarket, 6000);
+            setInterval(fetchAllLiveMarketData, 60000);
+
+            // Auto-refresh stories every 30 minutes
+            setInterval(fetchStories, 30 * 60 * 1000);
+
+            window.addWatchlistItem = addWatchlistItem;
+            window.removeWatchlistItem = removeWatchlistItem;
+            window.saveArticle = saveArticle;
+            window.unsaveArticle = unsaveArticle;
+            window.toggleSavedDrawer = toggleSavedDrawer;
+            window.clearAllSaved = clearAllSaved;
+
+            // Show popup if not already subscribed
+            if (!localStorage.getItem('alpha-access')) {
+                document.getElementById('welcome-modal').classList.remove('hidden');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+        async function handleSubscribe() {
+            const emailInput = document.getElementById('subscribe-email');
+            const msg = document.getElementById('subscribe-msg');
+            const email = emailInput.value.trim();
+
+            if (!email || !email.includes('@')) {
+                msg.textContent = "Please enter a valid email.";
+                msg.style.color = "#dc2626";
+                msg.classList.remove('hidden');
+                return;
+            }
+
+            msg.textContent = "Subscribing...";
+            msg.style.color = "#059669";
+            msg.classList.remove('hidden');
+
+            try {
+                const res = await fetch('/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+
+                msg.textContent = data.message || data.error;
+                if (res.ok) {
+                    emailInput.value = '';
+                } else {
+                    msg.style.color = "#dc2626";
+                }
+            } catch (e) {
+                msg.textContent = "Server error. Please try again.";
+                msg.style.color = "#dc2626";
+            }
+        }
+    </script>
+</body>
+
+</html>

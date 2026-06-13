@@ -49,6 +49,11 @@ def subscribe():
     
     return jsonify({'message': 'Successfully subscribed!'}), 201
 
+@app.route('/api/subscriber-count')
+def api_subscriber_count():
+    subs = load_subscribers()
+    return jsonify({'count': len(subs)})
+
 def dict_factory(cursor, row):
     d = {}
     for idx, col in enumerate(cursor.description):
@@ -63,12 +68,14 @@ def api_stories():
     conn = sqlite3.connect('alpha.db')
     conn.row_factory = dict_factory
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM stories ORDER BY lead DESC, id ASC')
+    cursor.execute('SELECT * FROM stories ORDER BY lead DESC, time DESC')
     rows = cursor.fetchall()
     conn.close()
     
     # Group by category
     stories = {}
+    dynamic_all_news = []
+    
     for row in rows:
         cat = row.pop('category')
         
@@ -100,10 +107,33 @@ def api_stories():
         # Remove null values to keep payload clean
         row = {k: v for k, v in row.items() if v is not None}
         
+        # Copy to dynamically build all-news
+        row_copy = dict(row)
+        row_copy['category'] = cat
+        dynamic_all_news.append(row_copy)
+        
         if cat not in stories:
             stories[cat] = []
         stories[cat].append(row)
         
+    # Deduplicate and sort all-news dynamically
+    seen_headlines = set()
+    dedup_all_news = []
+    for s in dynamic_all_news:
+        hl = s.get('headline')
+        if hl not in seen_headlines:
+            seen_headlines.add(hl)
+            dedup_all_news.append(s)
+            
+    dedup_all_news.sort(key=lambda x: (x.get('lead', False), x.get('time', '')), reverse=True)
+    
+    stories['all-news'] = dedup_all_news[:45]
+    
+    # Slice other categories to the latest 30 stories to keep payload small and fast
+    for k in stories:
+        if k != 'all-news':
+            stories[k] = stories[k][:30]
+            
     return jsonify(stories)
 
 @app.route('/api/market-data')

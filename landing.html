@@ -117,7 +117,7 @@
         <img src="mascot.png" alt="The Alpha Mascot" class="mascot">
         <h1 class="title">The Alpha</h1>
         <p class="subtitle">The definitive source for institutional-grade intelligence - bridging the gap between high-level editorial and live market execution</p>
-        <p class="sub-count">Over 26,000 subscribers</p>
+        <p class="sub-count" id="subscriber-count">Over 26,000 subscribers</p>
         
         <form id="subscribe-form" onsubmit="handleSubscribe(event)">
             <div class="input-group">
@@ -177,6 +177,20 @@
                 btn.disabled = false;
             }
         }
+
+        async function loadSubscriberCount() {
+            try {
+                const res = await fetch('/api/subscriber-count');
+                const data = await res.json();
+                if (data && data.count !== undefined) {
+                    const count = data.count;
+                    document.getElementById('subscriber-count').textContent = `${count.toLocaleString()} subscriber${count === 1 ? '' : 's'}`;
+                }
+            } catch (err) {
+                console.error("Failed to load subscriber count:", err);
+            }
+        }
+        window.addEventListener('DOMContentLoaded', loadSubscriberCount);
     </script>
 </body>
 </html>

@@ -181,6 +181,18 @@ def api_market_data():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/trigger_email')
+def trigger_email():
+    try:
+        from send_daily_alpha import send_email
+        success = send_email()
+        if success:
+            return jsonify({"status": "success", "message": "Email dispatched successfully! Check your inbox."})
+        else:
+            return jsonify({"status": "error", "message": "Failed to send email. Check if your SENDER_EMAIL and SENDER_APP_PASSWORD variables are set correctly in Railway."})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+
 if __name__ == '__main__':
     # Run on 0.0.0.0 so it can be accessed from the phone on the same Wi-Fi
     app.run(host='0.0.0.0', port=3333, debug=True)

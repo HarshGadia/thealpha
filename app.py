@@ -6,10 +6,34 @@ import sqlite3
 import urllib.request
 from urllib.error import URLError
 
+from apscheduler.schedulers.background import BackgroundScheduler
+import atexit
+
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
 
-DB_FILE = 'subscribers.json'
+DATA_DIR = os.environ.get('DATA_DIR', '.')
+DB_FILE = os.path.join(DATA_DIR, 'subscribers.json')
+ALPHA_DB = os.path.join(DATA_DIR, 'alpha.db')
+
+# --- Start Scheduler ---
+# We use Asia/Kolkata timezone so "morning" aligns with India.
+scheduler = BackgroundScheduler(timezone='Asia/Kolkata')
+try:
+    from live_aggregator import fetch_and_store
+    from send_daily_alpha import send_email
+    
+    # 1. Run the news aggregator every 30 minutes
+    scheduler.add_job(func=fetch_and_store, trigger="interval", minutes=30)
+    
+    # 2. Send the daily email every morning at 8:00 AM IST
+    scheduler.add_job(func=send_email, trigger="cron", hour=8, minute=0)
+    
+    scheduler.start()
+    atexit.register(lambda: scheduler.shutdown())
+except ImportError as e:
+    print(f"Warning: Could not import jobs for scheduler: {e}")
+# -----------------------
 
 def load_subscribers():
     if not os.path.exists(DB_FILE):
@@ -62,10 +86,10 @@ def dict_factory(cursor, row):
 
 @app.route('/api/stories')
 def api_stories():
-    if not os.path.exists('alpha.db'):
+    if not os.path.exists(ALPHA_DB):
         return jsonify({})
     
-    conn = sqlite3.connect('alpha.db')
+    conn = sqlite3.connect(ALPHA_DB)
     conn.row_factory = dict_factory
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM stories ORDER BY lead DESC, time DESC')

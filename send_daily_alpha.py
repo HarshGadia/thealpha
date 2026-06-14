@@ -89,10 +89,12 @@ def get_article_url(story):
 
 
 def get_stories():
-    if not os.path.exists('alpha.db'):
+    data_dir = os.environ.get('DATA_DIR', '.')
+    db_path = os.path.join(data_dir, 'alpha.db')
+    if not os.path.exists(db_path):
         print("Database not found.")
         return None
-    conn = sqlite3.connect('alpha.db')
+    conn = sqlite3.connect(db_path)
     conn.row_factory = dict_factory
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM stories ORDER BY lead DESC, time DESC')
@@ -322,8 +324,10 @@ def send_email():
     html_content = generate_email_html(stories)
 
     # Load subscribers
+    data_dir = os.environ.get('DATA_DIR', '.')
+    subs_path = os.path.join(data_dir, 'subscribers.json')
     try:
-        with open('subscribers.json', 'r') as f:
+        with open(subs_path, 'r') as f:
             subs = json.load(f)
     except Exception:
         subs = []

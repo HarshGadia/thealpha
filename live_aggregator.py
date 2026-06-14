@@ -286,7 +286,9 @@ FEEDS = [
     },
 ]
 
-DB_FILE = 'alpha.db'
+import os
+DATA_DIR = os.environ.get('DATA_DIR', '.')
+DB_FILE = os.path.join(DATA_DIR, 'alpha.db')
 
 # ============================================================
 # USER AGENT — avoids 403/406 on many sites

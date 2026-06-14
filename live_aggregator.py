@@ -385,6 +385,7 @@ def parse_entry_date(entry):
 
 def fetch_and_store():
     conn = sqlite3.connect(DB_FILE)
+    conn.execute('PRAGMA journal_mode=WAL;')
     cursor = conn.cursor()
     
     cursor.execute('''
@@ -506,7 +507,9 @@ def fetch_and_store():
             ))
             new_stories_count += 1
 
-    conn.commit()
+        # Commit after each feed to release the SQLite lock
+        conn.commit()
+
     conn.close()
 
     ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')

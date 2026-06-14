@@ -386,6 +386,35 @@ def parse_entry_date(entry):
 def fetch_and_store():
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
+    
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS stories (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        category TEXT NOT NULL,
+        lead BOOLEAN DEFAULT 0,
+        tag TEXT,
+        tagColor TEXT,
+        source TEXT,
+        sourceUrl TEXT,
+        headline TEXT,
+        subline TEXT,
+        body TEXT,
+        time TEXT,
+        articleUrl TEXT,
+        dealType TEXT,
+        dealStatus TEXT,
+        dealValue TEXT,
+        acquirer TEXT,
+        target TEXT,
+        metrics_json TEXT,
+        advisors_json TEXT,
+        vc_stage TEXT,
+        vc_investors TEXT,
+        vc_valuation TEXT,
+        vc_thesis TEXT,
+        vc_comparable TEXT
+    )
+    ''')
     new_stories_count = 0
     error_count = 0
     now_utc = datetime.now(timezone.utc)

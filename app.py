@@ -8,6 +8,7 @@ from urllib.error import URLError
 
 from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
+from datetime import datetime
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
@@ -23,8 +24,8 @@ try:
     from live_aggregator import fetch_and_store
     from send_daily_alpha import send_email
     
-    # 1. Run the news aggregator every 30 minutes
-    scheduler.add_job(func=fetch_and_store, trigger="interval", minutes=30)
+    # 1. Run the news aggregator immediately, then every 30 minutes
+    scheduler.add_job(func=fetch_and_store, trigger="interval", minutes=30, next_run_time=datetime.now())
     
     # 2. Send the daily email every morning at 8:00 AM IST
     scheduler.add_job(func=send_email, trigger="cron", hour=8, minute=0)

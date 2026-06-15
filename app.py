@@ -154,12 +154,12 @@ def api_stories():
             
     dedup_all_news.sort(key=lambda x: (x.get('lead', False), x.get('time', '')), reverse=True)
     
-    stories['all-news'] = dedup_all_news[:45]
+    stories['all-news'] = dedup_all_news[:250]
     
-    # Slice other categories to the latest 30 stories to keep payload small and fast
+    # Slice other categories to a larger limit so news persists for 24 hours
     for k in stories:
         if k != 'all-news':
-            stories[k] = stories[k][:30]
+            stories[k] = stories[k][:100]
             
     return jsonify(stories)
 

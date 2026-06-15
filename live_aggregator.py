@@ -510,6 +510,10 @@ def fetch_and_store():
         # Commit after each feed to release the SQLite lock
         conn.commit()
 
+    # Clean up old stories (older than 72 hours) to prevent DB bloat
+    cursor.execute("DELETE FROM stories WHERE time < datetime('now', '-3 days')")
+    conn.commit()
+
     conn.close()
 
     ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')

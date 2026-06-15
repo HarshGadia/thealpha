@@ -1033,7 +1033,7 @@
             localStorage.setItem('alpha-watchlist', JSON.stringify(list));
         }
 
-        function renderWatchlist() {
+        async function renderWatchlist() {
             const list = loadWatchlist();
             const container = document.getElementById('watchlist-items');
             if (!container) return;
@@ -1043,21 +1043,40 @@
                 return;
             }
 
-            container.innerHTML = list.map(sym => {
+            container.innerHTML = `<div class="p-4 text-center font-mono text-[10px] text-gray-500 bg-alpha-cream">Loading...</div>`;
+
+            const results = await Promise.all(list.map(async sym => {
+                try {
+                    const res = await fetch('/api/market-data?symbol=' + encodeURIComponent(sym));
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.price !== undefined) {
+                            return { sym, price: data.price, prev: data.prev || data.price };
+                        }
+                    }
+                } catch (e) {}
+                
+                // Fallback for missing/error
                 const seed = sym.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-                const price = (100 + (seed % 900)).toFixed(2);
-                const change = (((seed % 20) - 10) / 10).toFixed(2);
-                const isUp = parseFloat(change) >= 0;
+                return { sym, price: 100 + (seed % 900), prev: 100 + (seed % 900) }; 
+            }));
+
+            container.innerHTML = results.map(({sym, price, prev}) => {
+                const changePct = prev ? ((price - prev) / prev * 100).toFixed(2) : '0.00';
+                const isUp = parseFloat(changePct) >= 0;
                 const color = isUp ? 'text-green-600' : 'text-red-600';
                 const arrow = isUp ? '▲' : '▼';
+                
+                let formattedPrice = price.toFixed(2);
+                
                 return `
             <div class="flex justify-between items-center p-3 bg-alpha-cream" id="wl-${sym}">
                 <div>
                     <div class="font-mono text-[11px] font-bold text-gray-800">${sym}</div>
-                    <div class="font-mono text-[10px] text-gray-500">₹${price}</div>
+                    <div class="font-mono text-[10px] text-gray-500">₹${formattedPrice}</div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <span class="font-mono text-[10px] font-semibold ${color}">${arrow} ${Math.abs(change)}%</span>
+                    <span class="font-mono text-[10px] font-semibold ${color}">${arrow} ${Math.abs(changePct)}%</span>
                     <button onclick="removeWatchlistItem('${sym}')" class="material-symbols-outlined text-[14px] text-gray-300 hover:text-red-500 transition-colors">close</button>
                 </div>
             </div>`;

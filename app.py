@@ -5,6 +5,8 @@ import os
 import sqlite3
 import urllib.request
 from urllib.error import URLError
+import feedparser
+from bs4 import BeautifulSoup
 
 from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
@@ -178,6 +180,42 @@ def api_market_data():
                 'prev': meta.get('previousClose'),
                 'open': meta.get('regularMarketOpen')
             })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/custom-feed')
+def api_custom_feed():
+    feed_url = request.args.get('url')
+    if not feed_url:
+        return jsonify({'error': 'No URL provided'}), 400
+    
+    try:
+        feed = feedparser.parse(feed_url)
+        if not feed.entries:
+            return jsonify({'error': 'Could not parse feed or feed is empty'}), 400
+            
+        source_title = feed.feed.title if 'title' in feed.feed else urllib.parse.urlparse(feed_url).netloc
+        
+        stories = []
+        for entry in feed.entries[:15]:
+            # Extract plain text from summary/description
+            html_content = entry.get('summary', entry.get('description', ''))
+            soup = BeautifulSoup(html_content, 'html.parser')
+            body = soup.get_text(separator=' ').strip()
+            if len(body) > 300:
+                body = body[:297] + '...'
+                
+            stories.append({
+                'id': entry.get('id', entry.get('link')),
+                'headline': entry.get('title', 'Untitled'),
+                'body': body,
+                'articleUrl': entry.get('link', '#'),
+                'source': source_title,
+                'tag': 'CUSTOM',
+                'time': entry.get('published', datetime.now().isoformat())
+            })
+            
+        return jsonify(stories)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

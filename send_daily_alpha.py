@@ -5,6 +5,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import json
 import sqlite3
+import socket
 from datetime import datetime, timezone
 from dotenv import load_dotenv
 
@@ -343,7 +344,10 @@ def send_email():
     print(f"Connecting to SMTP... dispatching to {len(subs)} subscriber(s).")
 
     try:
-        server = smtplib.SMTP('smtp.gmail.com', 587)
+        # Force IPv4 resolution to prevent "Network is unreachable" on platforms without IPv6 (like Railway)
+        smtp_host = socket.gethostbyname('smtp.gmail.com')
+        server = smtplib.SMTP(smtp_host, 587)
+        server.ehlo('smtp.gmail.com') # Let gmail know who we are since we are connecting via IP
         server.starttls()
         server.login(SENDER_EMAIL, SENDER_PASSWORD)
 

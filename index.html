@@ -255,11 +255,33 @@
                     <div class="p-4">
                         <div class="flex gap-2 mb-4">
                             <input type="text" id="watchlist-input" placeholder="Ticker (e.g. INFY)"
+                                onkeypress="if(event.key === 'Enter') addWatchlistItem()"
                                 class="flex-1 bg-gray-50 border border-gray-300 px-3 py-2 font-mono text-xs uppercase outline-none focus:border-gray-900 transition-colors">
                             <button onclick="addWatchlistItem()"
                                 class="bg-gray-900 text-white px-4 py-2 font-mono text-xs uppercase hover:bg-gray-800 transition-colors">+</button>
                         </div>
                         <div id="watchlist-items" class="space-y-px bg-gray-200">
+                            <!-- Items injected here -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Custom Sources Widget -->
+                <section class="bg-alpha-cream border border-gray-200 shadow-sm">
+                    <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
+                        <h3 class="font-mono text-[11px] text-gray-600 uppercase font-bold tracking-widest">My Sources
+                        </h3>
+                        <span class="material-symbols-outlined text-gray-400 text-[18px]">rss_feed</span>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex gap-2 mb-4">
+                            <input type="text" id="source-input" placeholder="RSS URL..."
+                                onkeypress="if(event.key === 'Enter') addCustomSource()"
+                                class="flex-1 bg-gray-50 border border-gray-300 px-3 py-2 font-mono text-xs outline-none focus:border-gray-900 transition-colors">
+                            <button onclick="addCustomSource()"
+                                class="bg-gray-900 text-white px-4 py-2 font-mono text-xs uppercase hover:bg-gray-800 transition-colors">+</button>
+                        </div>
+                        <div id="source-items" class="space-y-px bg-gray-200">
                             <!-- Items injected here -->
                         </div>
                     </div>
@@ -390,6 +412,7 @@
             { id: 'global-dial', label: 'GLOBAL MACRO' },
             { id: 'fixed-income', label: 'FIXED INCOME' },
             { id: 'deep-reads', label: 'DEEP READS' },
+            { id: 'my-sources', label: 'MY SOURCES' },
             { id: 'saved-articles', label: 'SAVED' },
         ];
 
@@ -1060,6 +1083,62 @@
             renderWatchlist();
         }
 
+        // ==================== CUSTOM SOURCES ====================
+        function loadCustomSources() {
+            try { return JSON.parse(localStorage.getItem('alpha-custom-sources') || '[]'); }
+            catch (e) { return []; }
+        }
+        function saveCustomSources(list) {
+            localStorage.setItem('alpha-custom-sources', JSON.stringify(list));
+        }
+
+        function renderCustomSources() {
+            const list = loadCustomSources();
+            const container = document.getElementById('source-items');
+            if (!container) return;
+
+            if (list.length === 0) {
+                container.innerHTML = `<div class="p-4 text-center font-mono text-[10px] text-gray-500 bg-alpha-cream">No custom sources. Add an RSS URL above.</div>`;
+                return;
+            }
+
+            container.innerHTML = list.map(url => {
+                let domain = url;
+                try { domain = new URL(url).hostname.replace('www.', ''); } catch (e) {}
+                return `
+            <div class="flex justify-between items-center p-3 bg-alpha-cream" id="src-${domain}">
+                <div class="font-mono text-[10px] font-bold text-gray-800 truncate pr-2 w-48" title="${url}">${domain}</div>
+                <button onclick="removeCustomSource('${url}')" class="material-symbols-outlined text-[14px] text-gray-300 hover:text-red-500 transition-colors">close</button>
+            </div>`;
+            }).join('');
+        }
+
+        function addCustomSource() {
+            const input = document.getElementById('source-input');
+            let url = (input.value || '').trim();
+            if (!url) return;
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+            }
+            const list = loadCustomSources();
+            if (!list.includes(url) && list.length < 5) {
+                list.push(url);
+                saveCustomSources(list);
+                renderCustomSources();
+                fetchStories(); // Refresh to include new source
+            } else if (list.length >= 5) {
+                showToast('Maximum 5 custom sources allowed.');
+            }
+            input.value = '';
+        }
+
+        function removeCustomSource(url) {
+            const list = loadCustomSources().filter(s => s !== url);
+            saveCustomSources(list);
+            renderCustomSources();
+            fetchStories(); // Refresh to remove the source's news
+        }
+
 
         function handleSearch() {
             const q = document.getElementById('search-input').value.toLowerCase();
@@ -1127,6 +1206,26 @@
                 const res = await fetch('/api/stories?_t=' + new Date().getTime(), { cache: 'no-store' });
                 if (res.ok) {
                     STORIES = await res.json();
+                    
+                    // Fetch custom sources
+                    const sources = loadCustomSources();
+                    if (sources.length > 0) {
+                        STORIES['my-sources'] = [];
+                        const customPromises = sources.map(url => 
+                            fetch('/api/custom-feed?url=' + encodeURIComponent(url))
+                                .then(r => r.json())
+                                .catch(e => [])
+                        );
+                        const customResults = await Promise.all(customPromises);
+                        customResults.forEach(result => {
+                            if (Array.isArray(result)) {
+                                STORIES['my-sources'] = STORIES['my-sources'].concat(result);
+                            }
+                        });
+                        // Sort by time descending
+                        STORIES['my-sources'].sort((a, b) => new Date(b.time || 0) - new Date(a.time || 0));
+                    }
+                    
                     ORIGINAL_STORIES = JSON.parse(JSON.stringify(STORIES));
                     renderAllContent();
                 }
@@ -1155,6 +1254,7 @@
             fetchStories();
             renderTicker();
             renderWatchlist();
+            renderCustomSources();
             updateSavedUI(); // Initialize saved badge and layouts
 
             Object.keys(MARKET_DATA).forEach(k => renderMarketWidgetValue(k));
@@ -1169,6 +1269,8 @@
 
             window.addWatchlistItem = addWatchlistItem;
             window.removeWatchlistItem = removeWatchlistItem;
+            window.addCustomSource = addCustomSource;
+            window.removeCustomSource = removeCustomSource;
             window.saveArticle = saveArticle;
             window.unsaveArticle = unsaveArticle;
             window.toggleSavedDrawer = toggleSavedDrawer;

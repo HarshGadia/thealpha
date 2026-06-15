@@ -1050,8 +1050,8 @@
                     const res = await fetch('/api/market-data?symbol=' + encodeURIComponent(sym));
                     if (res.ok) {
                         const data = await res.json();
-                        if (data.price !== undefined) {
-                            return { sym, price: data.price, prev: data.prev || data.price };
+                        if (data.price != null) {
+                            return { sym, price: data.price, prev: data.prev != null ? data.prev : data.price };
                         }
                     }
                 } catch (e) {}
@@ -1062,12 +1062,14 @@
             }));
 
             container.innerHTML = results.map(({sym, price, prev}) => {
-                const changePct = prev ? ((price - prev) / prev * 100).toFixed(2) : '0.00';
+                const numPrice = parseFloat(price) || 0;
+                const numPrev = parseFloat(prev) || numPrice;
+                const changePct = numPrev ? ((numPrice - numPrev) / numPrev * 100).toFixed(2) : '0.00';
                 const isUp = parseFloat(changePct) >= 0;
                 const color = isUp ? 'text-green-600' : 'text-red-600';
                 const arrow = isUp ? '▲' : '▼';
                 
-                let formattedPrice = price.toFixed(2);
+                let formattedPrice = numPrice.toFixed(2);
                 
                 return `
             <div class="flex justify-between items-center p-3 bg-alpha-cream" id="wl-${sym}">

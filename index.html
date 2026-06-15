@@ -137,9 +137,9 @@
 
     <!-- Dedicated Tab Bar (from Image 1) -->
     <div class="bg-alpha-cream border-b border-gray-200 sticky top-0 z-40">
-        <div class="max-w-[1600px] mx-auto px-4 md:px-8">
+        <div class="max-w-[1600px] mx-auto px-4 md:px-8 overflow-x-auto no-scrollbar">
             <div id="tab-nav"
-                class="flex flex-wrap items-center justify-center md:justify-start gap-x-6 gap-y-2 md:gap-x-8 py-2">
+                class="flex flex-nowrap items-center justify-start gap-x-6 md:gap-x-8 py-2 min-w-max">
                 <!-- Tabs rendered via JS -->
             </div>
         </div>
@@ -498,15 +498,15 @@
                         const articleUrl = getArticleUrl(story);
 
                         return `
-                            <div class="p-4 bg-white border border-gray-200 hover:border-gray-300 transition-colors shadow-sm relative group">
+                            <div class="p-4 bg-white border border-gray-200 hover:border-gray-300 transition-colors shadow-sm relative group overflow-hidden">
                                 <div class="flex justify-between items-start gap-2 mb-2">
-                                    <span class="font-mono text-[9px] font-bold text-alpha-orange tracking-widest uppercase border border-gray-200 px-2 py-0.5">${tag}</span>
-                                    <span class="font-mono text-[8px] font-bold text-gray-400 tracking-widest uppercase">${source}</span>
+                                    <span class="font-mono text-[9px] font-bold text-alpha-orange tracking-widest uppercase border border-gray-200 px-2 py-0.5 break-words">${tag}</span>
+                                    <span class="font-mono text-[8px] font-bold text-gray-400 tracking-widest uppercase break-words">${source}</span>
                                 </div>
-                                <h4 class="font-serif text-sm font-bold text-gray-900 mb-1 leading-snug">
+                                <h4 class="font-serif text-sm font-bold text-gray-900 mb-1 leading-snug break-words line-clamp-3">
                                     <a href="${articleUrl}" target="_blank" class="hover:text-alpha-orange transition-colors">${headline}</a>
                                 </h4>
-                                ${body ? `<p class="font-sans text-[11px] text-gray-500 leading-normal mb-3">${body}</p>` : ''}
+                                ${body ? `<p class="font-sans text-[11px] text-gray-500 leading-normal mb-3 break-words line-clamp-4 overflow-hidden">${body}</p>` : ''}
                                 <div class="flex justify-between items-center pt-2 border-t border-gray-100">
                                     <a href="${articleUrl}" target="_blank" class="font-mono text-[9px] font-bold text-gray-400 tracking-widest hover:text-gray-900 transition-colors flex items-center gap-1">READ MORE &rarr;</a>
                                     <button onclick="unsaveArticle(${story.id}); event.stopPropagation();" class="font-mono text-[9px] font-bold text-red-600 tracking-widest hover:text-red-800 transition-colors flex items-center gap-1">
@@ -629,23 +629,23 @@
             if (isLead) {
                 // Layout from Image 2 (Rectangular Lead Story)
                 return `
-        <article class="bg-alpha-cream border border-gray-200 shadow-sm p-8 mb-6 border-l-4 border-l-alpha-green cursor-pointer hover:shadow-md transition-shadow">
+        <article class="bg-alpha-cream border border-gray-200 shadow-sm p-8 mb-6 border-l-4 border-l-alpha-green cursor-pointer hover:shadow-md transition-shadow overflow-hidden">
             <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center gap-2">
                     <span class="font-mono text-[10px] font-bold text-alpha-green tracking-widest">LEAD STORY</span>
                     <span class="text-gray-300">|</span>
-                    <span class="font-mono text-[10px] font-bold text-alpha-orange tracking-widest uppercase">${story.tag || 'LATEST'}</span>
+                    <span class="font-mono text-[10px] font-bold text-alpha-orange tracking-widest uppercase break-words">${story.tag || 'LATEST'}</span>
                 </div>
-                <span class="font-mono text-[10px] font-bold text-gray-400 tracking-widest uppercase">${story.source}</span>
+                <span class="font-mono text-[10px] font-bold text-gray-400 tracking-widest uppercase break-words">${story.source}</span>
             </div>
             
-            <h2 class="font-serif text-3xl font-bold italic text-gray-900 mb-2 leading-tight">
+            <h2 class="font-serif text-3xl font-bold italic text-gray-900 mb-2 leading-tight break-words">
                 <a href="${getArticleUrl(story)}"  target="_blank" class="hover:text-gray-600 transition-colors">${story.headline}</a>
             </h2>
             
-            ${story.subline ? `<p class="font-sans text-sm italic text-gray-500 mb-4 border-l-2 border-gray-200 pl-3 py-1">${story.subline}</p>` : ''}
+            ${story.subline ? `<p class="font-sans text-sm italic text-gray-500 mb-4 border-l-2 border-gray-200 pl-3 break-words">${story.subline}</p>` : ''}
             
-            <p class="font-sans text-sm text-gray-700 leading-relaxed mb-6">${story.body}</p>
+            <p class="font-sans text-base text-gray-700 leading-relaxed break-words">${story.body}</p>
             
             ${story.vc ? renderVCBlock(story.vc, true) : ''}
             
@@ -664,21 +664,21 @@
             } else {
                 // Layout from Image 2 (Square Grid Story)
                 return `
-        <article class="bg-white border-0 p-6 cursor-pointer hover:bg-gray-50 transition-colors flex flex-col h-full aspect-square relative">
+        <article class="bg-white border-0 p-6 cursor-pointer hover:bg-gray-50 transition-colors flex flex-col h-full aspect-square relative overflow-hidden">
             <div class="flex flex-col h-full justify-between">
                 <div>
             <div class="flex justify-between items-start mb-4">
-                <span class="font-mono text-[10px] font-bold text-gray-900 tracking-widest uppercase border border-gray-200 px-2 py-1">${story.tag || 'NEWS'}</span>
-                <span class="font-mono text-[9px] font-bold text-gray-400 tracking-widest uppercase text-right">${story.source}</span>
+                <span class="font-mono text-[10px] font-bold text-gray-900 tracking-widest uppercase border border-gray-200 px-2 py-1 break-words">${story.tag || 'NEWS'}</span>
+                <span class="font-mono text-[9px] font-bold text-gray-400 tracking-widest uppercase text-right break-words">${story.source}</span>
             </div>
             
-            <h3 class="font-serif text-[18px] font-bold text-gray-900 mb-2 leading-snug line-clamp-3">
+            <h3 class="font-serif text-[18px] font-bold text-gray-900 mb-2 leading-snug line-clamp-3 break-words">
                 <a href="${story.articleUrl || 'https://www.google.com/search?q=' + encodeURIComponent(story.headline + ' ' + story.source)}"  target="_blank" class="hover:text-gray-600 transition-colors">${story.headline}</a>
             </h3>
             
-            ${story.subline ? `<p class="font-sans text-[12px] italic text-gray-500 mb-3 border-l-2 border-gray-200 pl-2 line-clamp-1">${story.subline}</p>` : ''}
+            ${story.subline ? `<p class="font-sans text-[12px] italic text-gray-500 mb-3 border-l-2 border-gray-200 pl-2 line-clamp-1 break-words">${story.subline}</p>` : ''}
             
-            <p class="font-sans text-[13px] text-gray-600 leading-relaxed mb-4 line-clamp-3">${story.body}</p>
+            <p class="font-sans text-[13px] text-gray-600 leading-relaxed mb-4 line-clamp-3 break-words overflow-hidden">${story.body}</p>
             
             ${story.vc ? renderVCBlock(story.vc, false) : ''}
             </div>

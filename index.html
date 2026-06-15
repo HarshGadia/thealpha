@@ -136,10 +136,10 @@
     </div>
 
     <!-- Dedicated Tab Bar (from Image 1) -->
-    <div class="bg-alpha-cream border-b border-gray-200 sticky top-0 z-40">
-        <div class="max-w-[1600px] mx-auto px-4 md:px-8 overflow-x-auto no-scrollbar">
+    <div class="bg-alpha-cream border-b border-gray-200 sticky top-0 z-40 w-full overflow-hidden">
+        <div class="max-w-[1600px] mx-auto px-4 md:px-8 w-full">
             <div id="tab-nav"
-                class="flex flex-nowrap items-center justify-start gap-x-6 md:gap-x-8 py-2 min-w-max">
+                class="flex flex-nowrap items-center justify-between gap-x-2 md:gap-x-4 py-2 w-full">
                 <!-- Tabs rendered via JS -->
             </div>
         </div>
@@ -607,16 +607,16 @@
                 const activeClass = i === 0
                     ? 'text-gray-900 border-b-2 border-alpha-orange'
                     : 'text-gray-400 border-b-2 border-transparent hover:text-gray-700';
-                return `<button class="${activeClass} font-sans text-xs font-bold tracking-widest uppercase py-4 transition-colors tab-btn" data-tab="${tab.id}" onclick="switchTab('${tab.id}')">${tab.label}</button>`;
+                return `<button class="${activeClass} font-sans text-[10px] font-bold tracking-widest uppercase py-4 transition-colors whitespace-nowrap tab-btn" data-tab="${tab.id}" onclick="switchTab('${tab.id}')">${tab.label}</button>`;
             }).join('');
         }
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 if (btn.dataset.tab === tabId) {
-                    btn.className = 'text-gray-900 border-b-2 border-alpha-orange font-sans text-xs font-bold tracking-widest uppercase py-4 transition-colors tab-btn';
+                    btn.className = 'text-gray-900 border-b-2 border-alpha-orange font-sans text-[10px] font-bold tracking-widest uppercase py-4 transition-colors whitespace-nowrap tab-btn';
                 } else {
-                    btn.className = 'text-gray-400 border-b-2 border-transparent hover:text-gray-700 font-sans text-xs font-bold tracking-widest uppercase py-4 transition-colors tab-btn';
+                    btn.className = 'text-gray-400 border-b-2 border-transparent hover:text-gray-700 font-sans text-[10px] font-bold tracking-widest uppercase py-4 transition-colors whitespace-nowrap tab-btn';
                 }
             });
 

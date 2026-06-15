@@ -284,6 +284,89 @@ FEEDS = [
         'tag': 'STARTUP',
         'max_age_hours': 72,
     },
+    
+    # ============================================================
+    # IB DEALS  →  ib-transactions
+    # ============================================================
+    {
+        'url': 'https://techcrunch.com/category/mergers-and-acquisitions/feed/',
+        'category': 'ib-transactions',
+        'source': 'TechCrunch',
+        'tag': 'M&A',
+        'max_age_hours': 72,
+    },
+    {
+        'url': 'https://news.google.com/rss/search?q=Mergers+Acquisitions+M%26A+when:7d',
+        'category': 'ib-transactions',
+        'source': 'Google News',
+        'tag': 'DEALS',
+        'max_age_hours': 72,
+    },
+
+    # ============================================================
+    # ENERGY & GRID  →  energy-grid
+    # ============================================================
+    {
+        'url': 'https://www.livemint.com/rss/industry/energy',
+        'category': 'energy-grid',
+        'source': 'Mint',
+        'tag': 'ENERGY',
+        'max_age_hours': 72,
+    },
+    {
+        'url': 'https://economictimes.indiatimes.com/industry/energy/rssfeeds/13358371.cms',
+        'category': 'energy-grid',
+        'source': 'Economic Times',
+        'tag': 'POWER',
+        'max_age_hours': 72,
+    },
+
+    # ============================================================
+    # COMMODITIES  →  metal-shine
+    # ============================================================
+    {
+        'url': 'https://economictimes.indiatimes.com/markets/commodities/rssfeeds/11417036.cms',
+        'category': 'metal-shine',
+        'source': 'Economic Times',
+        'tag': 'METALS',
+        'max_age_hours': 72,
+    },
+    {
+        'url': 'https://news.google.com/rss/search?q=Commodities+Gold+Oil+Metals+when:7d',
+        'category': 'metal-shine',
+        'source': 'Google News',
+        'tag': 'COMMODITIES',
+        'max_age_hours': 72,
+    },
+
+    # ============================================================
+    # REGULATION  →  regulation-patrol
+    # ============================================================
+    {
+        'url': 'https://www.livemint.com/rss/politics',
+        'category': 'regulation-patrol',
+        'source': 'Mint',
+        'tag': 'POLICY',
+        'max_age_hours': 72,
+    },
+    {
+        'url': 'https://news.google.com/rss/search?q=SEC+Regulation+Compliance+FTC+when:7d',
+        'category': 'regulation-patrol',
+        'source': 'Google News',
+        'tag': 'REGULATION',
+        'max_age_hours': 72,
+    },
+
+    # ============================================================
+    # FIXED INCOME  →  fixed-income
+    # ============================================================
+    {
+        'url': 'https://news.google.com/rss/search?q=Fixed+Income+Bonds+Treasury+Yields+when:7d',
+        'category': 'fixed-income',
+        'source': 'Google News',
+        'tag': 'BONDS',
+        'max_age_hours': 72,
+    },
 ]
 
 import os

@@ -286,26 +286,15 @@ FEEDS = [
     },
     
     # ============================================================
-    # IB DEALS  →  ib-transactions
-    # ============================================================
-    {
-        'url': 'https://techcrunch.com/category/mergers-and-acquisitions/feed/',
-        'category': 'ib-transactions',
-        'source': 'TechCrunch',
-        'tag': 'M&A',
-        'max_age_hours': 72,
-    },
-    {
-        'url': 'https://news.google.com/rss/search?q=Mergers+Acquisitions+M%26A+when:7d',
-        'category': 'ib-transactions',
-        'source': 'Google News',
-        'tag': 'DEALS',
-        'max_age_hours': 72,
-    },
-
-    # ============================================================
     # ENERGY & GRID  →  energy-grid
     # ============================================================
+    {
+        'url': 'https://news.google.com/rss/search?q=Energy+Power+Grid+Renewables+when:7d',
+        'category': 'energy-grid',
+        'source': 'Google News',
+        'tag': 'ENERGY',
+        'max_age_hours': 72,
+    },
     {
         'url': 'https://www.livemint.com/rss/industry/energy',
         'category': 'energy-grid',
@@ -595,6 +584,10 @@ def fetch_and_store():
 
     # Clean up old stories (older than 72 hours) to prevent DB bloat
     cursor.execute("DELETE FROM stories WHERE time < datetime('now', '-3 days')")
+    
+    # Restore bespoke IB Deals by deleting the generic RSS pulls that lack multiple/advisors data
+    cursor.execute("DELETE FROM stories WHERE category = 'ib-transactions' AND source IN ('Google News', 'TechCrunch')")
+    
     conn.commit()
 
     conn.close()

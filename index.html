@@ -83,12 +83,75 @@
         html.dark video {
             filter: invert(1) hue-rotate(180deg);
         }
+
+        /* Onboarding Guided Tour Styles */
+        .tour-highlight {
+            position: absolute;
+            z-index: 9998;
+            box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.65), 0 0 15px rgba(249, 115, 22, 0.4);
+            border: 2px dashed #f97316; /* alpha-orange dashed border */
+            border-radius: 6px;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            pointer-events: none;
+        }
+
+        .tour-tooltip {
+            position: absolute;
+            z-index: 9999;
+            background: rgba(253, 251, 247, 0.96); /* alpha-cream base */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(15, 23, 42, 0.15);
+            border-radius: 8px;
+            padding: 20px;
+            width: 320px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: auto;
+        }
+
+        .tour-tooltip.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .tour-tooltip::after {
+            content: '';
+            position: absolute;
+            border-width: 8px;
+            border-style: solid;
+            border-color: transparent;
+        }
+
+        /* Tooltip Arrow positions */
+        .tour-tooltip.arrow-top::after {
+            bottom: 100%;
+            left: 20px;
+            border-bottom-color: rgba(253, 251, 247, 0.96);
+        }
+        .tour-tooltip.arrow-bottom::after {
+            top: 100%;
+            left: 20px;
+            border-top-color: rgba(253, 251, 247, 0.96);
+        }
+        .tour-tooltip.arrow-left::after {
+            right: 100%;
+            top: 20px;
+            border-right-color: rgba(253, 251, 247, 0.96);
+        }
+        .tour-tooltip.arrow-right::after {
+            left: 100%;
+            top: 20px;
+            border-left-color: rgba(253, 251, 247, 0.96);
+        }
     </style>
 </head>
 
 <body class="font-sans text-sm bg-alpha-cream">
     <!-- Top Logo Header -->
-    <header class="bg-alpha-cream border-b border-gray-200">
+    <header id="brand-header" class="bg-alpha-cream border-b border-gray-200">
         <div
             class="flex flex-col md:flex-row items-center justify-between py-4 md:py-6 px-4 md:px-8 max-w-[1600px] mx-auto gap-4 md:gap-0">
             <div class="flex items-center gap-4">
@@ -104,7 +167,7 @@
             </div>
             <div class="flex flex-col md:flex-row items-center gap-6">
                 <!-- Saved Button in Header -->
-                <button onclick="toggleSavedDrawer(true)"
+                <button id="saved-btn" onclick="toggleSavedDrawer(true)"
                     class="relative flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 font-mono text-xs uppercase hover:bg-gray-900 hover:text-white transition-all duration-200"
                     title="View Saved Articles">
                     <span class="material-symbols-outlined text-[18px]">bookmark</span>
@@ -121,7 +184,10 @@
                 <div class="text-center md:text-right hidden md:block">
                     <p class="font-mono text-xs md:text-sm text-gray-500 uppercase tracking-widest font-bold"
                         id="current-date">MONDAY, MAY 31, 2026</p>
-                    <p class="font-sans text-[10px] md:text-xs text-gray-400 mt-1">VOL. IV / NO. 142</p>
+                    <div class="flex items-center justify-end gap-3 mt-1">
+                        <button onclick="startOnboardingTour()" class="font-mono text-[9px] text-alpha-orange uppercase font-bold tracking-widest border border-alpha-orange/30 hover:border-alpha-orange px-2 py-0.5 rounded transition-all duration-200" title="Take a tour of the dashboard">Take Tour</button>
+                        <p class="font-sans text-[10px] md:text-xs text-gray-400">VOL. IV / NO. 142</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -186,7 +252,7 @@
             <div class="col-span-12 lg:col-span-3 space-y-8">
 
                 <!-- Macro & Rates Intelligence -->
-                <section class="bg-white border border-gray-200">
+                <section id="macro-section" class="bg-white border border-gray-200">
                     <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
                         <h3 class="font-mono text-[11px] text-gray-900 uppercase font-bold tracking-widest">Macro &
                             Rates</h3>
@@ -246,7 +312,7 @@
                 </section>
 
                 <!-- Watchlist -->
-                <section class="bg-alpha-cream border border-gray-200 shadow-sm">
+                <section id="watchlist-section" class="bg-alpha-cream border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
                         <h3 class="font-mono text-[11px] text-gray-600 uppercase font-bold tracking-widest">Watchlist
                         </h3>
@@ -267,7 +333,7 @@
                 </section>
 
                 <!-- Custom Sources Widget -->
-                <section class="bg-alpha-cream border border-gray-200 shadow-sm">
+                <section id="sources-section" class="bg-alpha-cream border border-gray-200 shadow-sm">
                     <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
                         <h3 class="font-mono text-[11px] text-gray-600 uppercase font-bold tracking-widest">My Sources
                         </h3>
@@ -1221,6 +1287,10 @@
                         document.getElementById('welcome-modal').classList.add('hidden');
                         // Optionally save to localStorage so it doesn't pop up again
                         localStorage.setItem('alpha-access', 'true');
+                        // Start the guided onboarding tour for new users
+                        if (!localStorage.getItem('alpha-tour-completed')) {
+                            startOnboardingTour();
+                        }
                     }, 800);
                 } else {
                     msg.textContent = data.error || "Failed.";
@@ -1314,6 +1384,11 @@
             // Show popup if not already subscribed
             if (!localStorage.getItem('alpha-access')) {
                 document.getElementById('welcome-modal').classList.remove('hidden');
+            } else {
+                // If already has access, trigger tour if not completed
+                if (!localStorage.getItem('alpha-tour-completed')) {
+                    setTimeout(startOnboardingTour, 1000);
+                }
             }
         }
 
@@ -1353,6 +1428,196 @@
                 msg.style.color = "#dc2626";
             }
         }
+
+        // ==================== ONBOARDING TOUR ENGINE ====================
+        let currentTourStep = 0;
+        const tourSteps = [
+            {
+                elementId: 'brand-header',
+                title: 'Welcome to The Alpha',
+                text: 'This is your institutional-grade terminal. Let us show you around the features designed to keep you ahead of the market.',
+                position: 'bottom'
+            },
+            {
+                elementId: 'tab-nav',
+                title: 'Intelligence Categories',
+                text: 'Switch between curated sectors like VC Inflow, Tech & AI, Markets, and Deep Reads to focus on what matters to you.',
+                position: 'bottom'
+            },
+            {
+                elementId: 'search-input',
+                title: 'Search Intel',
+                text: 'Perform real-time search across headlines, briefs, tags, and articles instantly.',
+                position: 'bottom'
+            },
+            {
+                elementId: 'saved-btn',
+                title: 'Saved Intelligence',
+                text: 'Bookmark high-value stories to read later. They are stored locally in your browser workspace.',
+                position: 'bottom'
+            },
+            {
+                elementId: 'macro-section',
+                title: 'Macro & Rates Trackers',
+                text: 'Monitor key indices, bond yields, and exchange rates (updated in real-time using our dedicated APIs).',
+                position: 'left'
+            },
+            {
+                elementId: 'watchlist-section',
+                title: 'Personal Watchlist',
+                text: 'Track specific stocks or indices. Enter any ticker symbol (e.g. INFY, TSLA) to add it to your watchlist.',
+                position: 'left'
+            },
+            {
+                elementId: 'sources-section',
+                title: 'Custom RSS Sources',
+                text: 'Add your own RSS/Atom feeds to pull external publications directly into your dashboard workspace.',
+                position: 'left'
+            }
+        ];
+
+        let tourHighlightEl = null;
+        let tourTooltipEl = null;
+
+        function startOnboardingTour() {
+            // Remove any existing tour elements
+            endOnboardingTour();
+
+            currentTourStep = 0;
+
+            // Create spotlight highlight element
+            tourHighlightEl = document.createElement('div');
+            tourHighlightEl.className = 'tour-highlight';
+            document.body.appendChild(tourHighlightEl);
+
+            // Create glassmorphic tooltip element
+            tourTooltipEl = document.createElement('div');
+            tourTooltipEl.className = 'tour-tooltip';
+            document.body.appendChild(tourTooltipEl);
+
+            renderTourStep();
+        }
+
+        function renderTourStep() {
+            if (currentTourStep < 0 || currentTourStep >= tourSteps.length) {
+                endOnboardingTour();
+                return;
+            }
+
+            const step = tourSteps[currentTourStep];
+            const targetEl = document.getElementById(step.elementId);
+
+            if (!targetEl) {
+                // If element isn't present in current layout, skip to next
+                currentTourStep++;
+                renderTourStep();
+                return;
+            }
+
+            // Scroll target element into view smoothly
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+
+            // Wait a brief moment for scroll to finish before positioning
+            setTimeout(() => {
+                const rect = targetEl.getBoundingClientRect();
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+                // Position highlight box
+                tourHighlightEl.style.top = `${rect.top + scrollTop - 4}px`;
+                tourHighlightEl.style.left = `${rect.left + scrollLeft - 4}px`;
+                tourHighlightEl.style.width = `${rect.width + 8}px`;
+                tourHighlightEl.style.height = `${rect.height + 8}px`;
+
+                // Set tooltip content
+                tourTooltipEl.innerHTML = `
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="font-mono text-[9px] font-bold text-alpha-orange tracking-widest uppercase">Step ${currentTourStep + 1} of ${tourSteps.length}</span>
+                        <button onclick="endOnboardingTour()" class="text-gray-400 hover:text-gray-900 transition-colors font-mono text-[10px] uppercase font-bold tracking-widest">Skip</button>
+                    </div>
+                    <h4 class="font-serif text-base font-bold text-gray-900 mb-2">${step.title}</h4>
+                    <p class="font-sans text-xs text-gray-600 leading-relaxed mb-4">${step.text}</p>
+                    <div class="flex justify-between items-center">
+                        <button onclick="prevTourStep()" class="font-mono text-[10px] uppercase font-bold tracking-wider text-gray-500 hover:text-gray-900 disabled:opacity-0 transition-opacity" ${currentTourStep === 0 ? 'disabled' : ''}>&larr; Back</button>
+                        <button onclick="nextTourStep()" class="bg-gray-900 hover:bg-gray-800 text-white font-mono text-[10px] uppercase font-bold tracking-widest px-4 py-2 rounded transition-colors">${currentTourStep === tourSteps.length - 1 ? 'Finish' : 'Next &rarr;'}</button>
+                    </div>
+                `;
+
+                // Position tooltip based on step preference
+                tourTooltipEl.className = 'tour-tooltip'; // reset classes
+                const tooltipWidth = 320;
+                let tooltipTop = rect.top + scrollTop;
+                let tooltipLeft = rect.left + scrollLeft;
+
+                if (step.position === 'bottom') {
+                    tooltipTop = rect.bottom + scrollTop + 12;
+                    // Center align with target if possible, else left
+                    tooltipLeft = Math.max(10, rect.left + scrollLeft + (rect.width / 2) - (tooltipWidth / 2));
+                    tourTooltipEl.classList.add('arrow-top');
+                } else if (step.position === 'top') {
+                    tooltipTop = rect.top + scrollTop - tourTooltipEl.offsetHeight - 12;
+                    tooltipLeft = Math.max(10, rect.left + scrollLeft + (rect.width / 2) - (tooltipWidth / 2));
+                    tourTooltipEl.classList.add('arrow-bottom');
+                } else if (step.position === 'left') {
+                    // Place it to the left of target
+                    tooltipLeft = rect.left + scrollLeft - tooltipWidth - 12;
+                    tooltipTop = rect.top + scrollTop;
+                    tourTooltipEl.classList.add('arrow-right');
+                    // Mobile fallback: position at bottom if screen too narrow
+                    if (window.innerWidth < 768 || tooltipLeft < 10) {
+                        tooltipLeft = 10;
+                        tooltipTop = rect.bottom + scrollTop + 12;
+                        tourTooltipEl.classList.remove('arrow-right');
+                        tourTooltipEl.classList.add('arrow-top');
+                    }
+                } else if (step.position === 'right') {
+                    tooltipLeft = rect.right + scrollLeft + 12;
+                    tooltipTop = rect.top + scrollTop;
+                    tourTooltipEl.classList.add('arrow-left');
+                    // Mobile fallback
+                    if (window.innerWidth < 768 || tooltipLeft + tooltipWidth > window.innerWidth) {
+                        tooltipLeft = 10;
+                        tooltipTop = rect.bottom + scrollTop + 12;
+                        tourTooltipEl.classList.remove('arrow-left');
+                        tourTooltipEl.classList.add('arrow-top');
+                    }
+                }
+
+                tourTooltipEl.style.top = `${tooltipTop}px`;
+                tourTooltipEl.style.left = `${tooltipLeft}px`;
+
+                // Add active class to fade-in tooltip
+                setTimeout(() => tourTooltipEl.classList.add('active'), 50);
+            }, 300);
+        }
+
+        function nextTourStep() {
+            currentTourStep++;
+            renderTourStep();
+        }
+
+        function prevTourStep() {
+            currentTourStep--;
+            renderTourStep();
+        }
+
+        function endOnboardingTour() {
+            if (tourHighlightEl) {
+                tourHighlightEl.remove();
+                tourHighlightEl = null;
+            }
+            if (tourTooltipEl) {
+                tourTooltipEl.remove();
+                tourTooltipEl = null;
+            }
+            localStorage.setItem('alpha-tour-completed', 'true');
+        }
+
+        // Register window methods so onclick handlers resolve correctly
+        window.startOnboardingTour = startOnboardingTour;
+        window.nextTourStep = nextTourStep;
+        window.prevTourStep = prevTourStep;
+        window.endOnboardingTour = endOnboardingTour;
     </script>
 </body>
 

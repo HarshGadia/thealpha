@@ -362,8 +362,12 @@ def trigger_morning_briefing():
         try:
             print("HTTP Synchronously triggering morning fetch and edition refresh...")
             from live_aggregator import fetch_and_store_morning
-            fetch_and_store_morning()
-            return jsonify({'status': 'success', 'message': 'Morning briefing completed successfully'}), 200
+            recipients = fetch_and_store_morning()
+            return jsonify({
+                'status': 'success', 
+                'message': 'Morning briefing completed successfully',
+                'recipients': recipients
+            }), 200
         except Exception as e:
             return jsonify({'status': 'error', 'message': str(e)}), 500
 
@@ -392,8 +396,12 @@ def trigger_evening_briefing():
         try:
             print("HTTP Synchronously triggering evening update and edition add...")
             from live_aggregator import fetch_and_store_evening
-            fetch_and_store_evening()
-            return jsonify({'status': 'success', 'message': 'Evening briefing completed successfully'}), 200
+            recipients = fetch_and_store_evening()
+            return jsonify({
+                'status': 'success', 
+                'message': 'Evening briefing completed successfully',
+                'recipients': recipients
+            }), 200
         except Exception as e:
             return jsonify({'status': 'error', 'message': str(e)}), 500
 

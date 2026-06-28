@@ -447,7 +447,7 @@ def send_email():
 
     if not subs:
         print("No subscribers found.")
-        return False
+        return (False, "No subscribers found")
 
     subject = f"Newtella Daily Briefing — {datetime.now().strftime('%B %d, %Y')}"
     print(f"Connecting to SMTP... dispatching to {len(subs)} subscriber(s).")
@@ -471,11 +471,11 @@ def send_email():
 
         server.quit()
         print("Email dispatched successfully to all subscribers!")
-        return True
+        return (True, subs)
 
     except Exception as e:
         print(f"SMTP Error: {e}")
-        return False
+        return (False, str(e))
 
 
 def generate_evening_email_html(stories):
@@ -675,7 +675,7 @@ def send_evening_email():
 
     if not subs:
         print("No subscribers found.")
-        return False
+        return (False, "No subscribers found")
 
     subject = f"Newtella Evening Update — {datetime.now().strftime('%B %d, %Y')}"
     print(f"Connecting to SMTP... dispatching to {len(subs)} subscriber(s).")
@@ -698,11 +698,11 @@ def send_evening_email():
 
         server.quit()
         print("Evening email dispatched successfully to all subscribers!")
-        return True
+        return (True, subs)
 
     except Exception as e:
         print(f"SMTP Error: {e}")
-        return False
+        return (False, str(e))
 
 
 if __name__ == "__main__":

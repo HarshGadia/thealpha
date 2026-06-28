@@ -456,9 +456,10 @@ def parse_entry_date(entry):
 
 
 def cache_exchange_rate():
-    """Fetch the latest USD/INR rate from the Exchange Rate API and store it in alpha.db."""
+    """Fetch the latest macro rates (USD/INR, India 10Y, RBI Repo, US Fed Rate) and store them in alpha.db."""
     import urllib.request
     import json
+    import re
     
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
@@ -471,6 +472,9 @@ def cache_exchange_rate():
             updated_at TIMESTAMP
         )
     """)
+    conn.commit()
+
+    # 1. USD/INR
     try:
         req = urllib.request.Request("https://open.er-api.com/v6/latest/USD", headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=5) as response:
@@ -480,7 +484,6 @@ def cache_exchange_rate():
             if inr_rate:
                 prev_rate = inr_rate
                 try:
-                    # Fetch previous close from Yahoo to show the daily percentage change
                     url = "https://query1.finance.yahoo.com/v8/finance/chart/USDINR%3DX?interval=1m&range=1d"
                     yf_req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
                     with urllib.request.urlopen(yf_req, timeout=2) as yf_resp:
@@ -495,11 +498,124 @@ def cache_exchange_rate():
                     VALUES ('USDINR=X', ?, ?, ?, datetime('now'))
                 """, (inr_rate, prev_rate, prev_rate))
                 conn.commit()
-                print(f"Cached USD/INR Exchange Rate: {inr_rate} (previous close: {prev_rate})")
+                print(f"Cached USD/INR: {inr_rate} (previous close: {prev_rate})")
     except Exception as e:
-        print(f"Failed to cache exchange rate: {e}")
-    finally:
-        conn.close()
+        print(f"Failed to cache USD/INR: {e}")
+
+    # 2. India 10Y Yield
+    try:
+        url = "https://tradingeconomics.com/india/government-bond-yield"
+        req = urllib.request.Request(url, headers={'User-Agent': UA})
+        with urllib.request.urlopen(req, timeout=5) as response:
+            html = response.read().decode('utf-8', errors='ignore')
+            price = None
+            match_json = re.search(r'"last":\s*([\d\.]+),.*?"name"\s*:\s*"India\s+10Y"', html)
+            if match_json:
+                price = float(match_json.group(1))
+            
+            match_desc = re.search(r'(?:eased|rose|dropped|fell|gained|declined|increased|hovered)\s+to\s+around\s+([\d\.]+)%|eased\s+to\s+([\d\.]+)%|rose\s+to\s+([\d\.]+)%', html, re.IGNORECASE)
+            p_desc = None
+            if match_desc:
+                for val in match_desc.groups():
+                    if val:
+                        p_desc = float(val)
+            
+            p_final = price if price is not None else p_desc
+            if p_final is not None:
+                change = 0.0
+                match_chg = re.search(r'marking\s+a\s+([\d\.]+)\s+percentage\s+points?\s+(decrease|increase|drop|rise)', html, re.IGNORECASE)
+                if match_chg:
+                    chg_val = float(match_chg.group(1))
+                    direction = match_chg.group(2).lower()
+                    sign = -1 if direction in ['decrease', 'drop'] else 1
+                    change = sign * chg_val
+                else:
+                    match_chg2 = re.search(r'change\s+of\s+([+\-\d\.]+)', html, re.IGNORECASE)
+                    if match_chg2:
+                        change = float(match_chg2.group(1))
+                
+                prev_val = p_final - change
+                cursor.execute("""
+                    INSERT OR REPLACE INTO market_rates (symbol, price, prev, open, updated_at) 
+                    VALUES ('IN10Y=X', ?, ?, ?, datetime('now'))
+                """, (p_final, prev_val, prev_val))
+                conn.commit()
+                print(f"Cached India 10Y Yield: {p_final} (prev: {prev_val})")
+    except Exception as e:
+        print(f"Failed to cache India 10Y Yield: {e}")
+
+    # 3. RBI Repo Rate
+    try:
+        url = "https://www.rbi.org.in/"
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=5) as response:
+            html = response.read().decode('utf-8', errors='ignore')
+            match = re.search(r'Policy\s*Repo\s*Rate.*?:\s*([\d\.]+)%', html, re.DOTALL | re.IGNORECASE)
+            price = None
+            if match:
+                price = float(match.group(1))
+            else:
+                match2 = re.search(r'Policy\s*Repo\s*Rate.*?<td>\s*:\s*([\d\.]+)%', html, re.DOTALL | re.IGNORECASE)
+                if match2:
+                    price = float(match2.group(1))
+            
+            if price is not None:
+                # Default prev to current price, or keep from DB if exists
+                prev_val = price
+                cursor.execute("SELECT price FROM market_rates WHERE symbol = 'REPORATE=X'")
+                row = cursor.fetchone()
+                if row:
+                    prev_val = row[0]
+                cursor.execute("""
+                    INSERT OR REPLACE INTO market_rates (symbol, price, prev, open, updated_at) 
+                    VALUES ('REPORATE=X', ?, ?, ?, datetime('now'))
+                """, (price, prev_val, prev_val))
+                conn.commit()
+                print(f"Cached RBI Repo Rate: {price} (prev: {prev_val})")
+    except Exception as e:
+        print(f"Failed to cache RBI Repo Rate: {e}")
+
+    # 4. US Fed Rate
+    try:
+        url = "https://tradingeconomics.com/united-states/interest-rate"
+        req = urllib.request.Request(url, headers={'User-Agent': UA})
+        with urllib.request.urlopen(req, timeout=5) as response:
+            html = response.read().decode('utf-8', errors='ignore')
+            price = None
+            match_json = re.search(r'"last":\s*([\d\.]+),.*?"ticker"\s*:\s*"FDTR:IND"', html)
+            if not match_json:
+                match_json = re.search(r'"last":\s*([\d\.]+),.*?"name"\s*:\s*"United States Interest Rate"', html)
+            if match_json:
+                price = float(match_json.group(1))
+            
+            match_desc = re.search(r'last recorded at ([\d\.]+) percent|benchmark interest rate.*?([\d\.]+) percent', html, re.DOTALL | re.IGNORECASE)
+            p_desc = None
+            if match_desc:
+                for val in match_desc.groups():
+                    if val:
+                        p_desc = float(val)
+            
+            p_final = price if price is not None else p_desc
+            if p_final is not None:
+                change = 0.0
+                if "unchanged" not in html.lower():
+                    match_chg = re.search(r'cut.*?by\s+([\d\.]+)\s+bps|raised.*?by\s+([\d\.]+)\s+bps|by\s+([\d\.]+)\s+basis\s+points', html, re.IGNORECASE)
+                    if match_chg:
+                        for val in match_chg.groups():
+                            if val:
+                                change = float(val) / 100.0
+                
+                prev_val = p_final - change
+                cursor.execute("""
+                    INSERT OR REPLACE INTO market_rates (symbol, price, prev, open, updated_at) 
+                    VALUES ('FEDRATE=X', ?, ?, ?, datetime('now'))
+                """, (p_final, prev_val, prev_val))
+                conn.commit()
+                print(f"Cached US Fed Rate: {p_final} (prev: {prev_val})")
+    except Exception as e:
+        print(f"Failed to cache US Fed Rate: {e}")
+
+    conn.close()
 
 
 def fetch_and_store():
@@ -629,8 +745,18 @@ def fetch_and_store():
         # Commit after each feed to release the SQLite lock
         conn.commit()
 
-    # Clean up old stories (older than 24 hours) to prevent DB bloat
-    cursor.execute("DELETE FROM stories WHERE time < datetime('now', '-1 day')")
+    # Clean up old stories (older than 24 hours) to prevent DB bloat,
+    # but always keep the 10 newest stories for each category so no section is ever empty.
+    cursor.execute("""
+        DELETE FROM stories 
+        WHERE time < datetime('now', '-1 day') 
+          AND id NOT IN (
+              SELECT id FROM (
+                  SELECT id, ROW_NUMBER() OVER (PARTITION BY category ORDER BY time DESC) as rn 
+                  FROM stories
+              ) WHERE rn <= 10
+          )
+    """)
     
     # Clean up orphaned mappings in edition_stories that point to deleted stories
     cursor.execute("DELETE FROM edition_stories WHERE story_id NOT IN (SELECT id FROM stories)")

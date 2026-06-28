@@ -53,6 +53,14 @@ def setup_db():
     )
     ''')
     
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS edition_stories (
+        story_id INTEGER PRIMARY KEY,
+        edition TEXT,
+        category TEXT
+    )
+    ''')
+    
     stories = get_stories()
     
     for category, category_stories in stories.items():

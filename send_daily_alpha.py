@@ -83,10 +83,12 @@ def smart_truncate(text, length=240):
 
 
 def get_article_url(story):
-    url = story.get('articleUrl', '').strip()
+    url = (story.get('articleUrl') or '').strip()
     if url:
         return url
-    query = f"{story.get('headline', '')} {story.get('source', '')}"
+    headline = story.get('headline') or ''
+    source = story.get('source') or ''
+    query = f"{headline} {source}"
     return "https://www.google.com/search?q=" + urllib.parse.quote_plus(query)
 
 
@@ -130,41 +132,40 @@ def get_stories(edition_filter=None):
 # HTML BUILDERS
 # ============================================================
 def render_lead_story(story):
-    tag = story.get('tag', 'LATEST')
-    source = story.get('source', '')
+    tag = story.get('tag') or 'LATEST'
+    source = story.get('source') or ''
     time_label = format_email_time(story.get('time'))
-    headline = story.get('headline', '')
-    body = smart_truncate(story.get('body', ''), 360)
+    headline = story.get('headline') or ''
+    body = smart_truncate(story.get('body') or '', 360)
     url = get_article_url(story)
 
     return f"""
-    <div style="border-left: 4px solid #059669; padding: 0 0 30px 24px; margin-bottom: 36px;">
-        <div style="font-size: 10px; font-weight: bold; color: #059669; text-transform: uppercase;
-                    letter-spacing: 2px; margin-bottom: 10px;">
-            LEAD STORY &nbsp;|&nbsp;
-            <span style="color: #6b7280;">{tag} &bull; {source} &bull; {time_label}</span>
+    <div style="padding-bottom: 25px; margin-bottom: 25px; border-bottom: 1px solid #e2e8f0;">
+        <div style="margin-bottom: 10px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1;">
+            <span style="color: #059669; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; display: inline-block;">
+                {tag}
+            </span>
+            <span style="font-size: 10.5px; color: #64748b; font-weight: 500; margin-left: 8px; display: inline-block; vertical-align: middle;">
+                {source} &bull; {time_label}
+            </span>
         </div>
         <a href="{url}" style="font-size: 26px; font-weight: bold; font-family: Georgia, serif;
                                color: #111827; text-decoration: none; display: block;
                                line-height: 1.3; margin-bottom: 14px;">
             {headline}
         </a>
-        <p style="font-size: 15px; line-height: 1.7; color: #374151; margin: 0 0 16px 0;">
+        <p style="font-size: 14.5px; line-height: 1.65; color: #374151; margin: 0 0 16px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
             {body}
         </p>
-        <a href="{url}" style="font-size: 11px; font-weight: bold; color: #059669;
-                               text-decoration: none; text-transform: uppercase; letter-spacing: 1px;">
-            Read Full Story &rarr;
-        </a>
     </div>
     """
 
 
 def render_section_header(label, accent):
     return f"""
-    <div style="border-top: 2px solid {accent}; padding-top: 6px; margin: 36px 0 20px 0;">
-        <span style="font-size: 10px; font-weight: bold; color: {accent};
-                     text-transform: uppercase; letter-spacing: 3px; font-family: Arial, sans-serif;">
+    <div style="border-bottom: 2px solid #111827; padding-bottom: 4px; margin: 25px 0 16px 0;">
+        <span style="font-size: 12px; font-weight: bold; color: #111827;
+                     text-transform: uppercase; letter-spacing: 2px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
             {label}
         </span>
     </div>
@@ -172,40 +173,36 @@ def render_section_header(label, accent):
 
 
 def render_story_card(story, accent, brief_length=220, is_deep_read=False):
-    tag = story.get('tag', 'NEWS')
-    source = story.get('source', '')
+    tag = story.get('tag') or 'NEWS'
+    source = story.get('source') or ''
     time_label = format_email_time(story.get('time'))
-    headline = story.get('headline', '')
-    body = smart_truncate(story.get('body', ''), brief_length if not is_deep_read else 340)
+    headline = story.get('headline') or ''
+    body = smart_truncate(story.get('body') or '', brief_length if not is_deep_read else 340)
     url = get_article_url(story)
 
-    headline_size = "17px" if not is_deep_read else "20px"
-    body_size = "13px" if not is_deep_read else "14px"
+    headline_size = "16px" if not is_deep_read else "19px"
+    body_size = "12.5px" if not is_deep_read else "13.5px"
+    margin_bottom = "16px" if not is_deep_read else "24px"
 
     return f"""
-    <div style="margin-bottom: 24px; padding-bottom: 24px;
-                border-bottom: 1px solid #f3f4f6;">
-        <div style="font-size: 10px; font-weight: bold; color: #9ca3af;
-                    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 7px;">
-            {source}
-            <span style="color: #d1d5db;">&nbsp;&bull;&nbsp;</span>
-            <span style="color: {accent};">{tag}</span>
-            <span style="color: #d1d5db;">&nbsp;&bull;&nbsp;</span>
-            {time_label}
+    <div style="margin-bottom: {margin_bottom}; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9;">
+        <div style="margin-bottom: 6px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1;">
+            <span style="color: {accent}; font-size: 9px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; display: inline-block;">
+                {tag}
+            </span>
+            <span style="font-size: 10px; color: #64748b; font-weight: 500; margin-left: 6px; display: inline-block; vertical-align: middle;">
+                {source} &bull; {time_label}
+            </span>
         </div>
         <a href="{url}" style="font-size: {headline_size}; font-weight: bold;
                                font-family: Georgia, serif; color: #111827;
                                text-decoration: none; display: block;
-                               line-height: 1.35; margin-bottom: 10px;">
+                               line-height: 1.35; margin-bottom: 8px;">
             {headline}
         </a>
-        <p style="font-size: {body_size}; line-height: 1.65; color: #4b5563; margin: 0 0 10px 0;">
+        <p style="font-size: {body_size}; line-height: 1.6; color: #475569; margin: 0 0 12px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
             {body}
         </p>
-        <a href="{url}" style="font-size: 10px; font-weight: bold; color: {accent};
-                               text-decoration: none; text-transform: uppercase; letter-spacing: 1px;">
-            Read More &rarr;
-        </a>
     </div>
     """
 
@@ -215,9 +212,8 @@ def render_story_card(story, accent, brief_length=220, is_deep_read=False):
 # ============================================================
 def generate_email_html(stories):
     today = datetime.now().strftime("%A, %B %d, %Y").upper()
-    issue_num = datetime.now().timetuple().tm_yday  # rough issue number
+    issue_num = datetime.now().timetuple().tm_yday
 
-    # ---- Lead story: best recent story from all-news, else any category ----
     all_flat = []
     for cat_stories in stories.values():
         all_flat.extend(cat_stories)
@@ -227,95 +223,193 @@ def generate_email_html(stories):
     if not lead_story and all_flat:
         lead_story = all_flat[0]
 
+    # Custom caps for the morning edition sections
+    caps = {
+        'vc-inflow': 2,
+        'stocks-arena': 1,
+        'tech-specs': 2,
+        'global-dial': 1,
+        'deep-reads': 1
+    }
+
+    # Helper to render a category block
+    def render_cat_block(cat_key):
+        cat_stories = stories.get(cat_key, [])
+        cat_stories = [s for s in cat_stories if s != lead_story]
+        if not cat_stories:
+            return ""
+        section = next((s for s in SECTIONS if s['key'] == cat_key), None)
+        if not section:
+            return ""
+        
+        limit = caps.get(cat_key, 2)
+        top_stories = cat_stories[:limit]
+        block = render_section_header(section['label'], section['accent'])
+        for story in top_stories:
+            block += render_story_card(story, accent=section['accent'])
+        return block
+
+    # Split main content into 2 columns for laptop width
+    left_html = render_cat_block('vc-inflow') + render_cat_block('stocks-arena')
+    right_html = render_cat_block('tech-specs') + render_cat_block('global-dial')
+    
+    # Deep reads (full width at bottom)
+    deep_reads_html = ""
+    cat_key = 'deep-reads'
+    if cat_key in stories:
+        cat_stories = [s for s in stories[cat_key] if s != lead_story]
+        if cat_stories:
+            section = next((s for s in SECTIONS if s['key'] == cat_key), None)
+            if section:
+                limit = caps.get(cat_key, 1)
+                top_stories = cat_stories[:limit]
+                deep_reads_html += """
+                <div style="text-align: center; border-top: 1.5px solid #111827; border-bottom: 1.5px solid #111827; padding: 6px 0; margin: 30px 0 20px 0;">
+                    <span style="font-size: 13px; font-weight: bold; color: #111827; text-transform: uppercase; letter-spacing: 3px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                        DEEP READ OF THE DAY
+                    </span>
+                </div>
+                """
+                for story in top_stories:
+                    deep_reads_html += render_story_card(story, accent=section['accent'], is_deep_read=True)
+
     # ---- Build HTML ----
-    html = f"""
-    <!DOCTYPE html>
+    html = f"""<!DOCTYPE html>
     <html>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Newtella — {today}</title>
+        <style>
+            body {{
+                margin: 0;
+                padding: 0;
+                background-color: #fdfbf7 !important;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                -webkit-text-size-adjust: 100%;
+                -ms-text-size-adjust: 100%;
+            }}
+            table, td {{
+                border-collapse: collapse;
+                mso-table-lspace: 0pt;
+                mso-table-rspace: 0pt;
+            }}
+            @media only screen and (max-width: 680px) {{
+                .container {{
+                    width: 100% !important;
+                    border: none !important;
+                    border-radius: 0px !important;
+                    margin: 0px !important;
+                }}
+                .responsive-col {{
+                    display: block !important;
+                    width: 100% !important;
+                    padding-left: 0 !important;
+                    padding-right: 0 !important;
+                    box-sizing: border-box !important;
+                }}
+                .responsive-table {{
+                    width: 100% !important;
+                }}
+                .inner-body {{
+                    padding: 24px 20px !important;
+                }}
+                .header-padding {{
+                    padding: 24px 20px 0px 20px !important;
+                }}
+            }}
+        </style>
     </head>
-    <body style="font-family: Arial, sans-serif; background-color: #f9fafb;
-                 color: #111827; margin: 0; padding: 20px 0;">
+    <body style="margin: 0; padding: 0; background-color: #fdfbf7;">
 
-        <div style="max-width: 620px; margin: 0 auto; background-color: #ffffff;
-                    border: 1px solid #e5e7eb;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fdfbf7; padding: 20px 0;">
+            <tr>
+                <td align="center">
+                    <div class="container" style="width: 95%; max-width: 880px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 4px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03); overflow: hidden;">
+                        
+                        <!-- ====== HEADER ====== -->
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff;">
+                            <tr>
+                                <td class="header-padding" style="padding: 36px 45px 0px 45px; text-align: center;">
+                                    <div style="font-size: 10px; font-weight: bold; color: #64748b; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 8px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                                        DAILY DISPATCH &bull; FINANCIAL TERMINAL
+                                    </div>
+                                    <div style="font-size: 42px; font-weight: bold; color: #111827; letter-spacing: -1.5px; font-family: Georgia, serif; line-height: 1.0; margin-bottom: 12px;">
+                                        Newtella Terminal
+                                    </div>
+                                    
+                                    <!-- Double rule date divider -->
+                                    <div style="border-top: 2.5px solid #111827; border-bottom: 0.5px solid #111827; padding: 6px 0; margin-top: 15px;">
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                            <tr>
+                                                <td align="left" style="font-size: 10.5px; color: #111827; text-transform: uppercase; letter-spacing: 2px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-weight: bold;">
+                                                    {today}
+                                                </td>
+                                                <td align="right" style="font-size: 10.5px; color: #111827; letter-spacing: 1.5px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-weight: bold;">
+                                                    ISSUE #{issue_num}
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
 
-            <!-- ====== HEADER ====== -->
-            <div style="background-color: #111827; padding: 28px 36px;">
-                <div style="font-size: 10px; font-weight: bold; color: #9ca3af;
-                            text-transform: uppercase; letter-spacing: 4px; margin-bottom: 8px;">
-                    NEWS + INTELLIGENCE
-                </div>
-                <div style="font-size: 36px; font-weight: bold; color: #ffffff;
-                            letter-spacing: -1px; font-family: Georgia, serif;">
-                    Newtella
-                </div>
-                <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 11px; color: #6b7280; text-transform: uppercase;
-                                 letter-spacing: 2px;">{today}</span>
-                    <span style="font-size: 10px; color: #4b5563; letter-spacing: 1px;">
-                        ISSUE #{issue_num}
-                    </span>
-                </div>
-            </div>
+                        <!-- ====== BODY ====== -->
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td class="inner-body" style="padding: 20px 45px 12px 45px; background-color: #ffffff;">
+                                    
+                                    <!-- Lead Story -->
+                                    {render_lead_story(lead_story) if lead_story else ''}
 
-            <!-- ====== BODY ====== -->
-            <div style="padding: 36px 36px 12px 36px;">
-    """
+                                    <!-- Grid Sections -->
+                                    <table class="responsive-table" role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
+                                        <tr>
+                                            <!-- Left Column -->
+                                            <td class="responsive-col" width="48%" valign="top" style="padding-right: 20px; vertical-align: top;">
+                                                {left_html}
+                                            </td>
+                                            <!-- Right Column -->
+                                            <td class="responsive-col" width="48%" valign="top" style="padding-left: 20px; vertical-align: top;">
+                                                {right_html}
+                                            </td>
+                                        </tr>
+                                    </table>
 
-    # Lead story
-    if lead_story:
-        html += render_lead_story(lead_story)
-    
-    # Sections
-    for section in SECTIONS:
-        cat_stories = stories.get(section['key'], [])
-        # Exclude lead story from sections to avoid duplication
-        cat_stories = [s for s in cat_stories if s != lead_story]
-        if not cat_stories:
-            continue
+                                    <!-- Full Width Deep Reads -->
+                                    {deep_reads_html}
 
-        top_stories = cat_stories[:section['count']]
-        html += render_section_header(section['label'], section['accent'])
+                                </td>
+                            </tr>
+                        </table>
 
-        for i, story in enumerate(top_stories):
-            is_last = (i == len(top_stories) - 1)
-            is_deep = section['key'] == 'deep-reads'
-            html += render_story_card(
-                story,
-                accent=section['accent'],
-                brief_length=220 if not is_deep else 340,
-                is_deep_read=is_deep
-            )
+                        <!-- ====== CTA ====== -->
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff;">
+                            <tr>
+                                <td align="center" style="padding: 10px 45px 36px 45px;">
+                                    <a href="{DASHBOARD_URL}" style="display: inline-block; background-color: #111827; color: #ffffff; padding: 13px 32px; text-decoration: none; font-size: 11px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; border-radius: 2px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                                        ACCESS FULL TERMINAL &rarr;
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
 
-    # Dashboard CTA
-    html += """
-            </div>
+                        <!-- ====== FOOTER ====== -->
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-top: 1px solid #e2e8f0;">
+                            <tr>
+                                <td style="padding: 24px 45px; text-align: center;">
+                                    <p style="font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 1.5px; margin: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-weight: bold;">
+                                        &copy; 2026 Newtella &nbsp;&bull;&nbsp; Auto-generated Daily briefing
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
 
-            <!-- ====== CTA ====== -->
-            <div style="padding: 0 36px 36px 36px; text-align: center;">
-                <a href="{DASHBOARD_URL}"
-                   style="display: inline-block; background-color: #111827; color: #ffffff;
-                          padding: 14px 32px; text-decoration: none; font-size: 12px;
-                          font-weight: bold; letter-spacing: 2px; text-transform: uppercase;
-                          margin-top: 12px;">
-                    VIEW FULL DASHBOARD &rarr;
-                </a>
-            </div>
-
-            <!-- ====== FOOTER ====== -->
-            <div style="background-color: #f9fafb; border-top: 1px solid #e5e7eb;
-                        padding: 20px 36px; text-align: center;">
-                <p style="font-size: 10px; color: #9ca3af; text-transform: uppercase;
-                           letter-spacing: 1px; margin: 0;">
-                    &copy; 2026 Newtella &nbsp;&bull;&nbsp;
-                    Auto-generated daily briefing
-                </p>
-            </div>
-
-        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
     </body>
     </html>
     """
@@ -388,87 +482,165 @@ def generate_evening_email_html(stories):
     today = datetime.now().strftime("%A, %B %d, %Y").upper()
     issue_num = datetime.now().timetuple().tm_yday
 
+    # Custom caps for the evening update sections (VC:2, Markets:2, Tech:2, Macro:2)
+    caps = {
+        'vc-inflow': 2,
+        'stocks-arena': 2,
+        'tech-specs': 2,
+        'global-dial': 2
+    }
+
+    # Helper for evening category block
+    def render_evening_cat_block(cat_key):
+        cat_stories = stories.get(cat_key, [])
+        if not cat_stories:
+            return ""
+        section = next((s for s in SECTIONS if s['key'] == cat_key), None)
+        if not section:
+            return ""
+        
+        limit = caps.get(cat_key, 2)
+        top_stories = cat_stories[:limit]
+        block = render_section_header(section['label'], "#991b1b")
+        for story in top_stories:
+            block += render_story_card(story, accent="#991b1b")
+        return block
+
+    # Split main content into columns
+    left_html = render_evening_cat_block('vc-inflow') + render_evening_cat_block('stocks-arena')
+    right_html = render_evening_cat_block('tech-specs') + render_evening_cat_block('global-dial')
+    
     # ---- Build HTML ----
-    html = f"""
-    <!DOCTYPE html>
+    html = f"""<!DOCTYPE html>
     <html>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Newtella Evening Update — {today}</title>
+        <style>
+            body {{
+                margin: 0;
+                padding: 0;
+                background-color: #fdfbf7 !important;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                -webkit-text-size-adjust: 100%;
+                -ms-text-size-adjust: 100%;
+            }}
+            table, td {{
+                border-collapse: collapse;
+                mso-table-lspace: 0pt;
+                mso-table-rspace: 0pt;
+            }}
+            @media only screen and (max-width: 680px) {{
+                .container {{
+                    width: 100% !important;
+                    border: none !important;
+                    border-radius: 0px !important;
+                    margin: 0px !important;
+                }}
+                .responsive-col {{
+                    display: block !important;
+                    width: 100% !important;
+                    padding-left: 0 !important;
+                    padding-right: 0 !important;
+                    box-sizing: border-box !important;
+                }}
+                .responsive-table {{
+                    width: 100% !important;
+                }}
+                .inner-body {{
+                    padding: 24px 20px !important;
+                }}
+                .header-padding {{
+                    padding: 24px 20px 0px 20px !important;
+                }}
+            }}
+        </style>
     </head>
-    <body style="font-family: Arial, sans-serif; background-color: #f9fafb;
-                 color: #111827; margin: 0; padding: 20px 0;">
+    <body style="margin: 0; padding: 0; background-color: #fdfbf7;">
 
-        <div style="max-width: 620px; margin: 0 auto; background-color: #ffffff;
-                    border: 1px solid #e5e7eb;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fdfbf7; padding: 20px 0;">
+            <tr>
+                <td align="center">
+                    <div class="container" style="width: 95%; max-width: 880px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 4px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03); overflow: hidden;">
+                        
+                        <!-- ====== HEADER ====== -->
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff;">
+                            <tr>
+                                <td class="header-padding" style="padding: 36px 45px 0px 45px; text-align: center;">
+                                    <div style="font-size: 10px; font-weight: bold; color: #b91c1c; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 8px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                                        LATE-BREAKING INTELLIGENCE &bull; EVENING EDITION
+                                    </div>
+                                    <div style="font-size: 42px; font-weight: bold; color: #991b1b; letter-spacing: -1.5px; font-family: Georgia, serif; line-height: 1.0; margin-bottom: 12px;">
+                                        Newtella: Late Update
+                                    </div>
+                                    
+                                    <!-- Double rule date divider (dark red) -->
+                                    <div style="border-top: 2.5px solid #991b1b; border-bottom: 0.5px solid #991b1b; padding: 6px 0; margin-top: 15px;">
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                            <tr>
+                                                <td align="left" style="font-size: 10.5px; color: #991b1b; text-transform: uppercase; letter-spacing: 2px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-weight: bold;">
+                                                    {today}
+                                                </td>
+                                                <td align="right" style="font-size: 10.5px; color: #991b1b; letter-spacing: 1.5px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-weight: bold;">
+                                                    LATE EDITION
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
 
-            <!-- ====== HEADER ====== -->
-            <div style="background-color: #991b1b; padding: 28px 36px;">
-                <div style="font-size: 10px; font-weight: bold; color: #fca5a5;
-                            text-transform: uppercase; letter-spacing: 4px; margin-bottom: 8px;">
-                    LATE-BREAKING INTELLIGENCE
-                </div>
-                <div style="font-size: 32px; font-weight: bold; color: #ffffff;
-                            letter-spacing: -1px; font-family: Georgia, serif;">
-                    Newtella: Evening Update
-                </div>
-                <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 11px; color: #fca5a5; text-transform: uppercase;
-                                 letter-spacing: 2px;">{today}</span>
-                    <span style="font-size: 10px; color: #fca5a5; letter-spacing: 1px;">
-                        LATE EDITION
-                    </span>
-                </div>
-            </div>
+                        <!-- ====== BODY ====== -->
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td class="inner-body" style="padding: 20px 45px 12px 45px; background-color: #ffffff;">
+                                    
+                                    <!-- Grid Sections -->
+                                    <table class="responsive-table" role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
+                                        <tr>
+                                            <!-- Left Column -->
+                                            <td class="responsive-col" width="48%" valign="top" style="padding-right: 20px; vertical-align: top;">
+                                                {left_html}
+                                            </td>
+                                            <!-- Right Column -->
+                                            <td class="responsive-col" width="48%" valign="top" style="padding-left: 20px; vertical-align: top;">
+                                                {right_html}
+                                            </td>
+                                        </tr>
+                                    </table>
 
-            <!-- ====== BODY ====== -->
-            <div style="padding: 36px 36px 12px 36px;">
-    """
+                                </td>
+                            </tr>
+                        </table>
 
-    # Sections
-    for section in SECTIONS:
-        cat_stories = stories.get(section['key'], [])
-        if not cat_stories:
-            continue
+                        <!-- ====== CTA ====== -->
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff;">
+                            <tr>
+                                <td align="center" style="padding: 10px 45px 36px 45px;">
+                                    <a href="{DASHBOARD_URL}" style="display: inline-block; background-color: #991b1b; color: #ffffff; padding: 13px 32px; text-decoration: none; font-size: 11px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; border-radius: 2px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                                        ACCESS FULL TERMINAL &rarr;
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
 
-        html += render_section_header(f"{section['label']} — EVENING UPDATE", "#991b1b")
+                        <!-- ====== FOOTER ====== -->
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-top: 1px solid #e2e8f0;">
+                            <tr>
+                                <td style="padding: 24px 45px; text-align: center;">
+                                    <p style="font-size: 10px; color: #991b1b; text-transform: uppercase; letter-spacing: 1.5px; margin: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-weight: bold;">
+                                        &copy; 2026 Newtella &nbsp;&bull;&nbsp; Auto-generated Evening update
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
 
-        for i, story in enumerate(cat_stories):
-            is_deep = section['key'] == 'deep-reads'
-            html += render_story_card(
-                story,
-                accent="#991b1b",
-                brief_length=220 if not is_deep else 340,
-                is_deep_read=is_deep
-            )
-
-    # Dashboard CTA
-    html += """
-            </div>
-
-            <!-- ====== CTA ====== -->
-            <div style="padding: 0 36px 36px 36px; text-align: center;">
-                <a href="{DASHBOARD_URL}"
-                   style="display: inline-block; background-color: #991b1b; color: #ffffff;
-                          padding: 14px 32px; text-decoration: none; font-size: 12px;
-                          font-weight: bold; letter-spacing: 2px; text-transform: uppercase;
-                          margin-top: 12px;">
-                    VIEW FULL DASHBOARD &rarr;
-                </a>
-            </div>
-
-            <!-- ====== FOOTER ====== -->
-            <div style="background-color: #f9fafb; border-top: 1px solid #e5e7eb;
-                        padding: 20px 36px; text-align: center;">
-                <p style="font-size: 10px; color: #9ca3af; text-transform: uppercase;
-                           letter-spacing: 1px; margin: 0;">
-                    &copy; 2026 Newtella &nbsp;&bull;&nbsp;
-                    Auto-generated evening briefing
-                </p>
-            </div>
-
-        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
     </body>
     </html>
     """

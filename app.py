@@ -218,30 +218,30 @@ def api_market_data():
     if not symbol:
         return jsonify({'error': 'No symbol provided'}), 400
     
-    if symbol == 'USDINR=X':
-        try:
-            # Query the SQLite market_rates cache table
-            conn = sqlite3.connect(ALPHA_DB)
-            cursor = conn.cursor()
-            cursor.execute("""
-                SELECT price, prev, open, updated_at 
-                FROM market_rates 
-                WHERE symbol = ?
-            """, (symbol,))
-            row = cursor.fetchone()
-            conn.close()
-            
-            if row:
-                price, prev, open_val, updated_at = row
-                print(f"Serving cached exchange rate for {symbol}: {price} (updated at {updated_at})")
-                return jsonify({
-                    'price': price,
-                    'prev': prev,
-                    'open': open_val
-                })
-        except Exception as e:
-            print(f"Error querying market_rates cache: {e}")
+    # Query the SQLite market_rates cache table for any symbol first!
+    try:
+        conn = sqlite3.connect(ALPHA_DB)
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT price, prev, open, updated_at 
+            FROM market_rates 
+            WHERE symbol = ?
+        """, (symbol,))
+        row = cursor.fetchone()
+        conn.close()
+        
+        if row:
+            price, prev, open_val, updated_at = row
+            print(f"Serving cached rate for {symbol}: {price} (updated at {updated_at})")
+            return jsonify({
+                'price': price,
+                'prev': prev,
+                'open': open_val
+            })
+    except Exception as e:
+        print(f"Error querying market_rates cache for {symbol}: {e}")
 
+    if symbol == 'USDINR=X':
         try:
             req = urllib.request.Request("https://open.er-api.com/v6/latest/USD", headers={'User-Agent': 'Mozilla/5.0'})
             with urllib.request.urlopen(req, timeout=5) as response:

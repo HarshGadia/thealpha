@@ -1067,8 +1067,8 @@
             us10y: { base: 4.38, prev: 4.38, fmt: v => v.toFixed(2) + '%', el: 'us10y-val', chgEl: 'us10y-chg', kind: 'yield', yahoo: '%5ETNX', bps: true },
             in10y: { base: 7.02, prev: 7.04, fmt: v => v.toFixed(2) + '%', el: 'in10y-val', chgEl: 'in10y-chg', kind: 'yield', bps: true },
             spread: { base: 255, prev: 266, fmt: v => Math.round(v) + ' bps', el: 'spread-val', chgEl: 'spread-chg', kind: 'spread', bps: true },
-            reporate: { base: 6.50, prev: 6.50, fmt: v => v.toFixed(2) + '%', el: 'reporate-val', chgEl: 'reporate-chg', kind: 'yield', bps: true },
-            fedrate: { base: 5.50, prev: 5.50, fmt: v => v.toFixed(2) + '%', el: 'fedrate-val', chgEl: 'fedrate-chg', kind: 'yield', bps: true },
+            reporate: { base: 6.50, prev: 6.50, fmt: v => v.toFixed(2) + '%', el: 'reporate-val', chgEl: 'reporate-chg', kind: 'policy', bps: true },
+            fedrate: { base: 5.50, prev: 5.50, fmt: v => v.toFixed(2) + '%', el: 'fedrate-val', chgEl: 'fedrate-chg', kind: 'policy', bps: true },
         };
         const MARKET_LIVE = {};
         Object.keys(MARKET_DATA).forEach(k => { MARKET_LIVE[k] = MARKET_DATA[k].base; });
@@ -1079,6 +1079,9 @@
             usdinr: 'USDINR=X',
             gold: 'GC=F',
             us10y: '^TNX',
+            in10y: 'IN10Y=X',
+            reporate: 'REPORATE=X',
+            fedrate: 'FEDRATE=X',
         };
 
         async function fetchYahooQuote(symbol) {
@@ -1156,6 +1159,8 @@
             let newVal;
             if (cfg.kind === 'spread') {
                 newVal = (MARKET_LIVE['in10y'] - MARKET_LIVE['us10y']) * 100;
+            } else if (cfg.kind === 'policy') {
+                newVal = oldVal; // Policy rates do not tick up/down randomly
             } else {
                 newVal = nudge(oldVal, cfg.kind);
             }

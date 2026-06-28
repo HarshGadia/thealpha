@@ -241,6 +241,38 @@ def api_market_data():
     except Exception as e:
         print(f"Error querying market_rates cache for {symbol}: {e}")
 
+    # Try Twelve Data API first if key is configured
+    apikey = os.getenv('TWELVE_DATA_API_KEY')
+    if apikey and symbol not in ['IN10Y=X', 'REPORATE=X', 'FEDRATE=X']:
+        td_symbol = symbol
+        if symbol == '^NSEI':
+            td_symbol = 'NSEI'
+        elif symbol == '^BSESN':
+            td_symbol = 'BSESN'
+        elif symbol == 'USDINR=X':
+            td_symbol = 'USD/INR'
+        elif symbol == 'GC=F':
+            td_symbol = 'XAU/USD'
+        elif symbol == '^TNX':
+            td_symbol = 'TNX'
+            
+        try:
+            url = f"https://api.twelvedata.com/quote?symbol={urllib.parse.quote(td_symbol)}&apikey={apikey}"
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(req, timeout=5) as response:
+                data = json.loads(response.read().decode())
+                if 'close' in data and data.get('code') != 404:
+                    price = float(data['close'])
+                    prev = float(data.get('previous_close') or price)
+                    print(f"Serving Twelve Data quote for {symbol} ({td_symbol}): {price}")
+                    return jsonify({
+                        'price': price,
+                        'prev': prev,
+                        'open': float(data.get('open') or price)
+                    })
+        except Exception as e:
+            print(f"Twelve Data lookup failed for {symbol}: {e}")
+
     if symbol == 'USDINR=X':
         try:
             req = urllib.request.Request("https://open.er-api.com/v6/latest/USD", headers={'User-Agent': 'Mozilla/5.0'})

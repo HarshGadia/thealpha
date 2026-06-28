@@ -38,6 +38,27 @@ def dict_factory(cursor, row):
     return d
 
 
+def connect_smtp(sender_email, sender_password):
+    # Try Port 587 first (STARTTLS)
+    try:
+        print("Connecting to SMTP on port 587...")
+        smtp_host = socket.gethostbyname('smtp.gmail.com')
+        server = smtplib.SMTP(smtp_host, 587, timeout=10)
+        server.ehlo('smtp.gmail.com')
+        server.starttls()
+        server.login(sender_email, sender_password)
+        return server
+    except Exception as e:
+        print(f"SMTP port 587 failed: {e}. Trying port 465 (SSL)...")
+        try:
+            smtp_host = socket.gethostbyname('smtp.gmail.com')
+            server = smtplib.SMTP_SSL(smtp_host, 465, timeout=10)
+            server.login(sender_email, sender_password)
+            return server
+        except Exception as ssl_err:
+            raise Exception(f"Both SMTP ports 587 and 465 failed. Port 587: {e} | Port 465: {ssl_err}")
+
+
 def format_email_time(time_str):
     if not time_str:
         return ""
@@ -453,12 +474,7 @@ def send_email():
     print(f"Connecting to SMTP... dispatching to {len(subs)} subscriber(s).")
 
     try:
-        # Force IPv4 resolution to prevent "Network is unreachable" on platforms without IPv6 (like Railway)
-        smtp_host = socket.gethostbyname('smtp.gmail.com')
-        server = smtplib.SMTP(smtp_host, 587)
-        server.ehlo('smtp.gmail.com') # Let gmail know who we are since we are connecting via IP
-        server.starttls()
-        server.login(SENDER_EMAIL, SENDER_PASSWORD)
+        server = connect_smtp(SENDER_EMAIL, SENDER_PASSWORD)
 
         for email in subs:
             print(f"  Sending to {email}...")
@@ -681,11 +697,7 @@ def send_evening_email():
     print(f"Connecting to SMTP... dispatching to {len(subs)} subscriber(s).")
 
     try:
-        smtp_host = socket.gethostbyname('smtp.gmail.com')
-        server = smtplib.SMTP(smtp_host, 587)
-        server.ehlo('smtp.gmail.com')
-        server.starttls()
-        server.login(SENDER_EMAIL, SENDER_PASSWORD)
+        server = connect_smtp(SENDER_EMAIL, SENDER_PASSWORD)
 
         for email in subs:
             print(f"  Sending evening update to {email}...")

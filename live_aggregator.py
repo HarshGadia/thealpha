@@ -582,8 +582,11 @@ def fetch_and_store():
         # Commit after each feed to release the SQLite lock
         conn.commit()
 
-    # Clean up old stories (older than 72 hours) to prevent DB bloat
-    cursor.execute("DELETE FROM stories WHERE time < datetime('now', '-3 days')")
+    # Clean up old stories (older than 24 hours) to prevent DB bloat
+    cursor.execute("DELETE FROM stories WHERE time < datetime('now', '-1 day')")
+    
+    # Clean up orphaned mappings in edition_stories that point to deleted stories
+    cursor.execute("DELETE FROM edition_stories WHERE story_id NOT IN (SELECT id FROM stories)")
     
     # Restore bespoke IB Deals by deleting the generic RSS pulls that lack multiple/advisors data
     cursor.execute("DELETE FROM stories WHERE category = 'ib-transactions' AND source IN ('Google News', 'TechCrunch')")

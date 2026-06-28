@@ -626,6 +626,9 @@
         }
 
         function renderStoryCard(story, isLead, isSavedPage = false) {
+            const isEvening = story.is_evening_update;
+            const eveningBadge = isEvening ? `<span class="font-mono text-[9px] font-bold text-red-600 tracking-widest uppercase border border-red-200 bg-red-50 px-2 py-0.5 animate-pulse ml-2">LATE UPDATE</span>` : '';
+
             if (isLead) {
                 // Layout from Image 2 (Rectangular Lead Story)
                 return `
@@ -635,6 +638,7 @@
                     <span class="font-mono text-[10px] font-bold text-alpha-green tracking-widest">LEAD STORY</span>
                     <span class="text-gray-300">|</span>
                     <span class="font-mono text-[10px] font-bold text-alpha-orange tracking-widest uppercase break-words">${story.tag || 'LATEST'}</span>
+                    ${eveningBadge}
                 </div>
                 <span class="font-mono text-[10px] font-bold text-gray-400 tracking-widest uppercase break-words">${story.source}</span>
             </div>
@@ -668,7 +672,10 @@
             <div class="flex flex-col h-full justify-between">
                 <div>
             <div class="flex justify-between items-start mb-4">
-                <span class="font-mono text-[10px] font-bold text-gray-900 tracking-widest uppercase border border-gray-200 px-2 py-1 break-words">${story.tag || 'NEWS'}</span>
+                <div class="flex flex-wrap items-center gap-1">
+                    <span class="font-mono text-[10px] font-bold text-gray-900 tracking-widest uppercase border border-gray-200 px-2 py-1 break-words">${story.tag || 'NEWS'}</span>
+                    ${eveningBadge}
+                </div>
                 <span class="font-mono text-[9px] font-bold text-gray-400 tracking-widest uppercase text-right break-words">${story.source}</span>
             </div>
             
@@ -710,6 +717,9 @@
         }
 
         function renderDealCard(deal, isLead, isSavedPage = false) {
+            const isEvening = deal.is_evening_update;
+            const eveningBadge = isEvening ? `<span class="font-mono text-[9px] font-bold text-red-600 tracking-widest uppercase border border-red-200 bg-red-50 px-2 py-0.5 animate-pulse ml-2">LATE UPDATE</span>` : '';
+
             // Deal cards adapted to the rectangular/square layout aesthetic
             const statusColor = (deal.dealStatus || '').toLowerCase() === 'completed' ? 'text-alpha-green' : 'text-gray-900';
 
@@ -732,6 +742,7 @@
                     <span class="font-mono text-[10px] font-bold text-alpha-green tracking-widest">LEAD DEAL</span>
                     <span class="text-gray-300">|</span>
                     <span class="font-mono text-[10px] font-bold text-alpha-orange tracking-widest uppercase">${deal.dealType || 'M&A'}</span>
+                    ${eveningBadge}
                 </div>
                 <span class="font-mono text-[10px] font-bold ${statusColor} tracking-widest uppercase">${deal.dealStatus || 'Announced'}</span>
             </div>
@@ -776,7 +787,10 @@
             <div class="flex flex-col h-full justify-between">
                 <div>
             <div class="flex justify-between items-center mb-3 border-b border-gray-100 pb-2">
-                <span class="font-mono text-[9px] font-bold text-alpha-orange tracking-widest uppercase">${deal.dealType || 'M&A'}</span>
+                <div class="flex items-center gap-1">
+                    <span class="font-mono text-[9px] font-bold text-alpha-orange tracking-widest uppercase">${deal.dealType || 'M&A'}</span>
+                    ${eveningBadge}
+                </div>
                 <span class="font-mono text-[9px] font-bold ${statusColor} tracking-widest uppercase">${deal.dealStatus || 'Announced'}</span>
             </div>
             
@@ -856,11 +870,11 @@
                     : renderStoryCard(sorted[0], true, isSavedTab);
             }
 
-            // Render Grid Stories (Remaining items - max 6, except for saved tab which lists all)
+            // Render Grid Stories (Remaining items - rendering all stories without frontend slice)
             if (sorted.length > 1) {
                 html += `<div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-gray-200 border border-gray-200">`;
                 const gridItems = sorted.slice(1);
-                const displayItems = isSavedTab ? gridItems : gridItems.slice(0, 6);
+                const displayItems = gridItems; // render all stories returned by the backend
                 for (let i = 0; i < displayItems.length; i++) {
                     html += `<div class="bg-white">`;
                     html += isDealsTab

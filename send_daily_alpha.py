@@ -14,6 +14,7 @@ load_dotenv()
 SENDER_EMAIL = os.getenv("SENDER_EMAIL")
 SENDER_PASSWORD = os.getenv("SENDER_APP_PASSWORD")
 RECEIVER_EMAIL = os.getenv("RECEIVER_EMAIL")
+DASHBOARD_URL = os.getenv("DASHBOARD_URL", "http://localhost:3333/dashboard")
 
 # ============================================================
 # SECTION CONFIG  — controls what appears in the email and order
@@ -89,7 +90,7 @@ def get_article_url(story):
     return "https://www.google.com/search?q=" + urllib.parse.quote_plus(query)
 
 
-def get_stories():
+def get_stories(edition_filter=None):
     data_dir = os.environ.get('DATA_DIR', '.')
     db_path = os.path.join(data_dir, 'alpha.db')
     if not os.path.exists(db_path):
@@ -98,7 +99,21 @@ def get_stories():
     conn = sqlite3.connect(db_path)
     conn.row_factory = dict_factory
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM stories ORDER BY lead DESC, time DESC')
+    
+    if edition_filter:
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='edition_stories'")
+        if cursor.fetchone():
+            cursor.execute('''
+                SELECT s.* FROM stories s
+                JOIN edition_stories e ON s.id = e.story_id
+                WHERE e.edition = ?
+                ORDER BY s.lead DESC, s.time DESC
+            ''', (edition_filter,))
+        else:
+            cursor.execute('SELECT * FROM stories ORDER BY lead DESC, time DESC')
+    else:
+        cursor.execute('SELECT * FROM stories ORDER BY lead DESC, time DESC')
+        
     rows = cursor.fetchall()
     conn.close()
 
@@ -281,7 +296,7 @@ def generate_email_html(stories):
 
             <!-- ====== CTA ====== -->
             <div style="padding: 0 36px 36px 36px; text-align: center;">
-                <a href="http://localhost:3333/dashboard"
+                <a href="{DASHBOARD_URL}"
                    style="display: inline-block; background-color: #111827; color: #ffffff;
                           padding: 14px 32px; text-decoration: none; font-size: 12px;
                           font-weight: bold; letter-spacing: 2px; text-transform: uppercase;
@@ -316,7 +331,7 @@ def send_email():
         return False
 
     print("Reading news from alpha.db...")
-    stories = get_stories()
+    stories = get_stories(edition_filter='morning')
     if not stories:
         print("Failed to load stories.")
         return False
@@ -369,5 +384,158 @@ def send_email():
         return False
 
 
+def generate_evening_email_html(stories):
+    today = datetime.now().strftime("%A, %B %d, %Y").upper()
+    issue_num = datetime.now().timetuple().tm_yday
+
+    # ---- Build HTML ----
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>The Alpha Evening Update — {today}</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; background-color: #f9fafb;
+                 color: #111827; margin: 0; padding: 20px 0;">
+
+        <div style="max-width: 620px; margin: 0 auto; background-color: #ffffff;
+                    border: 1px solid #e5e7eb;">
+
+            <!-- ====== HEADER ====== -->
+            <div style="background-color: #991b1b; padding: 28px 36px;">
+                <div style="font-size: 10px; font-weight: bold; color: #fca5a5;
+                            text-transform: uppercase; letter-spacing: 4px; margin-bottom: 8px;">
+                    LATE-BREAKING INTELLIGENCE
+                </div>
+                <div style="font-size: 32px; font-weight: bold; color: #ffffff;
+                            letter-spacing: -1px; font-family: Georgia, serif;">
+                    THE ALPHA: EVENING UPDATE
+                </div>
+                <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 11px; color: #fca5a5; text-transform: uppercase;
+                                 letter-spacing: 2px;">{today}</span>
+                    <span style="font-size: 10px; color: #fca5a5; letter-spacing: 1px;">
+                        LATE EDITION
+                    </span>
+                </div>
+            </div>
+
+            <!-- ====== BODY ====== -->
+            <div style="padding: 36px 36px 12px 36px;">
+    """
+
+    # Sections
+    for section in SECTIONS:
+        cat_stories = stories.get(section['key'], [])
+        if not cat_stories:
+            continue
+
+        html += render_section_header(f"{section['label']} — EVENING UPDATE", "#991b1b")
+
+        for i, story in enumerate(cat_stories):
+            is_deep = section['key'] == 'deep-reads'
+            html += render_story_card(
+                story,
+                accent="#991b1b",
+                brief_length=220 if not is_deep else 340,
+                is_deep_read=is_deep
+            )
+
+    # Dashboard CTA
+    html += """
+            </div>
+
+            <!-- ====== CTA ====== -->
+            <div style="padding: 0 36px 36px 36px; text-align: center;">
+                <a href="{DASHBOARD_URL}"
+                   style="display: inline-block; background-color: #991b1b; color: #ffffff;
+                          padding: 14px 32px; text-decoration: none; font-size: 12px;
+                          font-weight: bold; letter-spacing: 2px; text-transform: uppercase;
+                          margin-top: 12px;">
+                    VIEW FULL DASHBOARD &rarr;
+                </a>
+            </div>
+
+            <!-- ====== FOOTER ====== -->
+            <div style="background-color: #f9fafb; border-top: 1px solid #e5e7eb;
+                        padding: 20px 36px; text-align: center;">
+                <p style="font-size: 10px; color: #9ca3af; text-transform: uppercase;
+                           letter-spacing: 1px; margin: 0;">
+                    &copy; 2026 The Alpha Intelligence Group &nbsp;&bull;&nbsp;
+                    Auto-generated evening briefing
+                </p>
+            </div>
+
+        </div>
+    </body>
+    </html>
+    """
+    return html
+
+
+def send_evening_email():
+    if not all([SENDER_EMAIL, SENDER_PASSWORD]):
+        print("ERROR: Missing SENDER_EMAIL or SENDER_APP_PASSWORD in .env")
+        return False
+
+    print("Reading evening news from alpha.db...")
+    stories = get_stories(edition_filter='evening')
+    if not stories or not any(stories.values()):
+        print("No new evening stories found. Skipping evening email.")
+        return False
+
+    print("Generating evening email HTML...")
+    html_content = generate_evening_email_html(stories)
+
+    # Load subscribers
+    data_dir = os.environ.get('DATA_DIR', '.')
+    subs_path = os.path.join(data_dir, 'subscribers.json')
+    try:
+        with open(subs_path, 'r') as f:
+            subs = json.load(f)
+    except Exception:
+        subs = []
+
+    if RECEIVER_EMAIL and RECEIVER_EMAIL not in subs:
+        subs.append(RECEIVER_EMAIL)
+
+    if not subs:
+        print("No subscribers found.")
+        return False
+
+    subject = f"The Alpha Evening Update — {datetime.now().strftime('%B %d, %Y')}"
+    print(f"Connecting to SMTP... dispatching to {len(subs)} subscriber(s).")
+
+    try:
+        smtp_host = socket.gethostbyname('smtp.gmail.com')
+        server = smtplib.SMTP(smtp_host, 587)
+        server.ehlo('smtp.gmail.com')
+        server.starttls()
+        server.login(SENDER_EMAIL, SENDER_PASSWORD)
+
+        for email in subs:
+            print(f"  Sending evening update to {email}...")
+            msg = MIMEMultipart('alternative')
+            msg['Subject'] = subject
+            msg['From'] = f"The Alpha Terminal <{SENDER_EMAIL}>"
+            msg['To'] = email
+            msg.attach(MIMEText(html_content, 'html'))
+            server.sendmail(SENDER_EMAIL, email, msg.as_string())
+
+        server.quit()
+        print("Evening email dispatched successfully to all subscribers!")
+        return True
+
+    except Exception as e:
+        print(f"SMTP Error: {e}")
+        return False
+
+
 if __name__ == "__main__":
-    send_email()
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == 'evening':
+        send_evening_email()
+    else:
+        send_email()

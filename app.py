@@ -218,6 +218,35 @@ def api_market_data():
     if not symbol:
         return jsonify({'error': 'No symbol provided'}), 400
     
+    if symbol == 'USDINR=X':
+        try:
+            req = urllib.request.Request("https://open.er-api.com/v6/latest/USD", headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(req, timeout=5) as response:
+                data = json.loads(response.read().decode())
+                rates = data.get('rates', {})
+                inr_rate = rates.get('INR')
+                if inr_rate:
+                    prev_rate = inr_rate
+                    try:
+                        # Try to get previous close from Yahoo to show the daily percentage change
+                        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{urllib.parse.quote(symbol)}?interval=1m&range=1d"
+                        yf_req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                        with urllib.request.urlopen(yf_req, timeout=2) as yf_resp:
+                            yf_data = json.loads(yf_resp.read().decode())
+                            meta = yf_data.get('chart', {}).get('result', [{}])[0].get('meta', {})
+                            if meta.get('previousClose'):
+                                prev_rate = meta.get('previousClose')
+                    except Exception:
+                        pass
+                    return jsonify({
+                        'price': inr_rate,
+                        'prev': prev_rate,
+                        'open': prev_rate
+                    })
+        except Exception as e:
+            print(f"Error fetching from Exchange Rate API: {e}")
+            # Fall back to Yahoo Finance if Exchange Rate API fails
+
     url = f"https://query1.finance.yahoo.com/v8/finance/chart/{urllib.parse.quote(symbol)}?interval=1m&range=1d"
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     try:
@@ -307,6 +336,26 @@ def trigger_evening_briefing():
 
     threading.Thread(target=run_task).start()
     return jsonify({'status': 'success', 'message': 'Evening briefing task triggered in background'}), 200
+
+@app.route('/api/tasks/fetch-news', methods=['GET', 'POST'])
+def trigger_fetch_news():
+    secret_token = os.environ.get('CRON_SECRET_TOKEN')
+    if secret_token:
+        token = request.args.get('token') or request.headers.get('X-Cron-Token')
+        if token != secret_token:
+            return jsonify({'error': 'Unauthorized'}), 401
+
+    import threading
+    def run_task():
+        try:
+            print("HTTP Triggered news aggregation...")
+            from live_aggregator import fetch_and_store
+            fetch_and_store()
+        except Exception as e:
+            print(f"Error in triggered news aggregation: {e}")
+
+    threading.Thread(target=run_task).start()
+    return jsonify({'status': 'success', 'message': 'News aggregation task triggered in background'}), 200
 
 @app.route('/api/trigger_email')
 def trigger_email():

@@ -596,6 +596,123 @@ def fetch_and_store():
     print(f"\n[{ts}] Aggregation complete — {new_stories_count} new stories added, {error_count} feed errors.\n")
 
 
+def ensure_edition_stories_populated():
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute("CREATE TABLE IF NOT EXISTS edition_stories (story_id INTEGER PRIMARY KEY, edition TEXT, category TEXT)")
+    
+    # Check if table has valid rows (joined with stories table)
+    cursor.execute("SELECT COUNT(*) FROM edition_stories e JOIN stories s ON e.story_id = s.id")
+    count = cursor.fetchone()[0]
+    
+    if count < 10:
+        print("edition_stories table is empty or stale. Initializing/rebuilding now...")
+        cursor.execute("DELETE FROM edition_stories")
+        # Populate morning edition with top 12 stories per category
+        cursor.execute("SELECT DISTINCT category FROM stories")
+        categories = [r[0] for r in cursor.fetchall()]
+        
+        for cat in categories:
+            cursor.execute("SELECT id FROM stories WHERE category = ? ORDER BY lead DESC, time DESC LIMIT 12", (cat,))
+            story_ids = [r[0] for r in cursor.fetchall()]
+            for sid in story_ids:
+                cursor.execute("INSERT OR REPLACE INTO edition_stories (story_id, edition, category) VALUES (?, 'morning', ?)", (sid, cat))
+                
+        # Also populate evening edition if current time is past 5:00 PM (17:00) IST
+        now_ist = datetime.now(timezone(timedelta(hours=5, minutes=30)))
+        if now_ist.hour >= 17:
+            cutoff_ist = now_ist.replace(hour=11, minute=0, second=0, microsecond=0)
+            cutoff_utc = cutoff_ist.astimezone(timezone.utc)
+            cutoff_str = cutoff_utc.isoformat()
+            
+            for cat in categories:
+                cursor.execute("""
+                    SELECT id FROM stories 
+                    WHERE category = ? AND time >= ? 
+                      AND id NOT IN (SELECT story_id FROM edition_stories)
+                    ORDER BY lead DESC, time DESC 
+                    LIMIT 4
+                """, (cat, cutoff_str))
+                story_ids = [r[0] for r in cursor.fetchall()]
+                for sid in story_ids:
+                    cursor.execute("INSERT OR REPLACE INTO edition_stories (story_id, edition, category) VALUES (?, 'evening', ?)", (sid, cat))
+        
+        conn.commit()
+    conn.close()
+
+
+def fetch_and_store_morning():
+    print("Running morning fetch and edition refresh at 7:30 AM IST...")
+    fetch_and_store()
+    
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute("CREATE TABLE IF NOT EXISTS edition_stories (story_id INTEGER PRIMARY KEY, edition TEXT, category TEXT)")
+    cursor.execute("DELETE FROM edition_stories")
+    
+    cursor.execute("SELECT DISTINCT category FROM stories")
+    categories = [r[0] for r in cursor.fetchall()]
+    
+    for cat in categories:
+        cursor.execute("SELECT id FROM stories WHERE category = ? ORDER BY lead DESC, time DESC LIMIT 12", (cat,))
+        story_ids = [r[0] for r in cursor.fetchall()]
+        for sid in story_ids:
+            cursor.execute("INSERT OR REPLACE INTO edition_stories (story_id, edition, category) VALUES (?, 'morning', ?)", (sid, cat))
+            
+    conn.commit()
+    conn.close()
+    
+    try:
+        from send_daily_alpha import send_email
+        send_email()
+    except Exception as e:
+        print(f"Error sending morning email: {e}")
+
+
+def fetch_and_store_evening():
+    print("Running evening update and edition add at 5:00 PM IST...")
+    fetch_and_store()
+    
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute("CREATE TABLE IF NOT EXISTS edition_stories (story_id INTEGER PRIMARY KEY, edition TEXT, category TEXT)")
+    
+    now_ist = datetime.now(timezone(timedelta(hours=5, minutes=30)))
+    cutoff_ist = now_ist.replace(hour=11, minute=0, second=0, microsecond=0)
+    cutoff_utc = cutoff_ist.astimezone(timezone.utc)
+    cutoff_str = cutoff_utc.isoformat()
+    
+    cursor.execute("SELECT DISTINCT category FROM stories")
+    categories = [r[0] for r in cursor.fetchall()]
+    
+    evening_story_ids = []
+    
+    for cat in categories:
+        cursor.execute("""
+            SELECT id FROM stories 
+            WHERE category = ? AND time >= ? 
+              AND id NOT IN (SELECT story_id FROM edition_stories)
+            ORDER BY lead DESC, time DESC 
+            LIMIT 4
+        """, (cat, cutoff_str))
+        story_ids = [r[0] for r in cursor.fetchall()]
+        for sid in story_ids:
+            cursor.execute("INSERT OR REPLACE INTO edition_stories (story_id, edition, category) VALUES (?, 'evening', ?)", (sid, cat))
+            evening_story_ids.append(sid)
+            
+    conn.commit()
+    conn.close()
+    
+    if evening_story_ids:
+        try:
+            from send_daily_alpha import send_evening_email
+            send_evening_email()
+        except Exception as e:
+            print(f"Error sending evening email: {e}")
+    else:
+        print("No new evening stories found. Skipping evening email.")
+
+
 def run_loop():
     total = len(FEEDS)
     print(f"Starting Live Aggregator with {total} feeds...")

@@ -234,7 +234,7 @@ def generate_email_html(stories):
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>The Alpha — {today}</title>
+        <title>Newtella — {today}</title>
     </head>
     <body style="font-family: Arial, sans-serif; background-color: #f9fafb;
                  color: #111827; margin: 0; padding: 20px 0;">
@@ -246,11 +246,11 @@ def generate_email_html(stories):
             <div style="background-color: #111827; padding: 28px 36px;">
                 <div style="font-size: 10px; font-weight: bold; color: #9ca3af;
                             text-transform: uppercase; letter-spacing: 4px; margin-bottom: 8px;">
-                    INTEGRATED INTELLIGENCE
+                    NEWS + INTELLIGENCE
                 </div>
                 <div style="font-size: 36px; font-weight: bold; color: #ffffff;
                             letter-spacing: -1px; font-family: Georgia, serif;">
-                    THE ALPHA
+                    Newtella
                 </div>
                 <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-size: 11px; color: #6b7280; text-transform: uppercase;
@@ -310,7 +310,7 @@ def generate_email_html(stories):
                         padding: 20px 36px; text-align: center;">
                 <p style="font-size: 10px; color: #9ca3af; text-transform: uppercase;
                            letter-spacing: 1px; margin: 0;">
-                    &copy; 2026 The Alpha Intelligence Group &nbsp;&bull;&nbsp;
+                    &copy; 2026 Newtella &nbsp;&bull;&nbsp;
                     Auto-generated daily briefing
                 </p>
             </div>
@@ -355,7 +355,7 @@ def send_email():
         print("No subscribers found.")
         return False
 
-    subject = f"The Alpha Daily Briefing — {datetime.now().strftime('%B %d, %Y')}"
+    subject = f"Newtella Daily Briefing — {datetime.now().strftime('%B %d, %Y')}"
     print(f"Connecting to SMTP... dispatching to {len(subs)} subscriber(s).")
 
     try:
@@ -370,7 +370,7 @@ def send_email():
             print(f"  Sending to {email}...")
             msg = MIMEMultipart('alternative')
             msg['Subject'] = subject
-            msg['From'] = f"The Alpha Terminal <{SENDER_EMAIL}>"
+            msg['From'] = f"Newtella Terminal <{SENDER_EMAIL}>"
             msg['To'] = email
             msg.attach(MIMEText(html_content, 'html'))
             server.sendmail(SENDER_EMAIL, email, msg.as_string())
@@ -395,7 +395,7 @@ def generate_evening_email_html(stories):
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>The Alpha Evening Update — {today}</title>
+        <title>Newtella Evening Update — {today}</title>
     </head>
     <body style="font-family: Arial, sans-serif; background-color: #f9fafb;
                  color: #111827; margin: 0; padding: 20px 0;">
@@ -411,7 +411,7 @@ def generate_evening_email_html(stories):
                 </div>
                 <div style="font-size: 32px; font-weight: bold; color: #ffffff;
                             letter-spacing: -1px; font-family: Georgia, serif;">
-                    THE ALPHA: EVENING UPDATE
+                    Newtella: Evening Update
                 </div>
                 <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-size: 11px; color: #fca5a5; text-transform: uppercase;
@@ -463,7 +463,7 @@ def generate_evening_email_html(stories):
                         padding: 20px 36px; text-align: center;">
                 <p style="font-size: 10px; color: #9ca3af; text-transform: uppercase;
                            letter-spacing: 1px; margin: 0;">
-                    &copy; 2026 The Alpha Intelligence Group &nbsp;&bull;&nbsp;
+                    &copy; 2026 Newtella &nbsp;&bull;&nbsp;
                     Auto-generated evening briefing
                 </p>
             </div>
@@ -505,7 +505,7 @@ def send_evening_email():
         print("No subscribers found.")
         return False
 
-    subject = f"The Alpha Evening Update — {datetime.now().strftime('%B %d, %Y')}"
+    subject = f"Newtella Evening Update — {datetime.now().strftime('%B %d, %Y')}"
     print(f"Connecting to SMTP... dispatching to {len(subs)} subscriber(s).")
 
     try:
@@ -519,7 +519,7 @@ def send_evening_email():
             print(f"  Sending evening update to {email}...")
             msg = MIMEMultipart('alternative')
             msg['Subject'] = subject
-            msg['From'] = f"The Alpha Terminal <{SENDER_EMAIL}>"
+            msg['From'] = f"Newtella Terminal <{SENDER_EMAIL}>"
             msg['To'] = email
             msg.attach(MIMEText(html_content, 'html'))
             server.sendmail(SENDER_EMAIL, email, msg.as_string())

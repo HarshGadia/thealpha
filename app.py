@@ -40,12 +40,9 @@ if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
         # 1. Run the news aggregator interval job immediately, then every 30 minutes
         scheduler.add_job(func=fetch_and_store, trigger="interval", minutes=30, next_run_time=datetime.now())
         
-        # Note: Morning and Evening cron jobs are commented out here because running schedulers
-        # inside Gunicorn workers on Railway is unreliable (pre-fork thread death).
-        # Instead, these are triggered via secure HTTP endpoints `/api/tasks/morning-briefing`
-        # and `/api/tasks/evening-briefing` via an external reliable cron service.
-        # scheduler.add_job(func=fetch_and_store_morning, trigger="cron", hour=7, minute=30)
-        # scheduler.add_job(func=fetch_and_store_evening, trigger="cron", hour=17, minute=0)
+        # Enable built-in cron scheduling directly in the Flask app (since we run 1 worker process)
+        scheduler.add_job(func=fetch_and_store_morning, trigger="cron", hour=7, minute=30)
+        scheduler.add_job(func=fetch_and_store_evening, trigger="cron", hour=17, minute=30)
         
         scheduler.start()
         atexit.register(lambda: scheduler.shutdown())

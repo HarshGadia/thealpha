@@ -21,21 +21,36 @@ ALPHA_DB = os.path.join(DATA_DIR, 'alpha.db')
 
 # --- Start Scheduler ---
 # We use Asia/Kolkata timezone so "morning" aligns with India.
-scheduler = BackgroundScheduler(timezone='Asia/Kolkata')
-try:
-    from live_aggregator import fetch_and_store
-    from send_daily_alpha import send_email
-    
-    # 1. Run the news aggregator immediately, then every 30 minutes
-    scheduler.add_job(func=fetch_and_store, trigger="interval", minutes=30, next_run_time=datetime.now())
-    
-    # 2. Send the daily email every morning at 8:00 AM IST
-    scheduler.add_job(func=send_email, trigger="cron", hour=8, minute=0)
-    
-    scheduler.start()
-    atexit.register(lambda: scheduler.shutdown())
-except ImportError as e:
-    print(f"Warning: Could not import jobs for scheduler: {e}")
+if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
+    scheduler = BackgroundScheduler(timezone='Asia/Kolkata')
+    try:
+        from live_aggregator import (
+            fetch_and_store, 
+            fetch_and_store_morning, 
+            fetch_and_store_evening,
+            ensure_edition_stories_populated
+        )
+        
+        # Ensure edition_stories is initialized on startup
+        try:
+            ensure_edition_stories_populated()
+        except Exception as e:
+            print(f"Warning: Could not initialize edition_stories: {e}")
+
+        # 1. Run the news aggregator interval job immediately, then every 30 minutes
+        scheduler.add_job(func=fetch_and_store, trigger="interval", minutes=30, next_run_time=datetime.now())
+        
+        # Note: Morning and Evening cron jobs are commented out here because running schedulers
+        # inside Gunicorn workers on Railway is unreliable (pre-fork thread death).
+        # Instead, these are triggered via secure HTTP endpoints `/api/tasks/morning-briefing`
+        # and `/api/tasks/evening-briefing` via an external reliable cron service.
+        # scheduler.add_job(func=fetch_and_store_morning, trigger="cron", hour=7, minute=30)
+        # scheduler.add_job(func=fetch_and_store_evening, trigger="cron", hour=17, minute=0)
+        
+        scheduler.start()
+        atexit.register(lambda: scheduler.shutdown())
+    except ImportError as e:
+        print(f"Warning: Could not import jobs for scheduler: {e}")
 # -----------------------
 
 def load_subscribers():
@@ -92,10 +107,39 @@ def api_stories():
     if not os.path.exists(ALPHA_DB):
         return jsonify({})
     
+    # Ensure edition stories are populated
+    try:
+        from live_aggregator import ensure_edition_stories_populated
+        ensure_edition_stories_populated()
+    except Exception as e:
+        print(f"Error ensuring edition stories populated: {e}")
+        
     conn = sqlite3.connect(ALPHA_DB)
     conn.row_factory = dict_factory
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM stories ORDER BY lead DESC, time DESC')
+    
+    # Determine the current time in IST
+    from datetime import timezone as dt_timezone, timedelta as dt_timedelta
+    IST = dt_timezone(dt_timedelta(hours=5, minutes=30))
+    now_ist = datetime.now(IST)
+    
+    # If the current time is 5:00 PM (17:00) IST or later, show both morning and evening editions.
+    # Otherwise, show only morning.
+    if now_ist.hour >= 17:
+        cursor.execute('''
+            SELECT s.*, e.edition FROM stories s
+            JOIN edition_stories e ON s.id = e.story_id
+            WHERE e.edition IN ('morning', 'evening')
+            ORDER BY s.lead DESC, s.time DESC
+        ''')
+    else:
+        cursor.execute('''
+            SELECT s.*, e.edition FROM stories s
+            JOIN edition_stories e ON s.id = e.story_id
+            WHERE e.edition = 'morning'
+            ORDER BY s.lead DESC, s.time DESC
+        ''')
+        
     rows = cursor.fetchall()
     conn.close()
     
@@ -131,6 +175,11 @@ def api_stories():
         # Boolean cast
         row['lead'] = bool(row.get('lead'))
         
+        # Check if the story is from evening update
+        row['is_evening_update'] = (row.get('edition') == 'evening')
+        if 'edition' in row:
+            del row['edition']
+            
         # Remove null values to keep payload clean
         row = {k: v for k, v in row.items() if v is not None}
         
@@ -218,6 +267,46 @@ def api_custom_feed():
         return jsonify(stories)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/tasks/morning-briefing', methods=['GET', 'POST'])
+def trigger_morning_briefing():
+    secret_token = os.environ.get('CRON_SECRET_TOKEN')
+    if secret_token:
+        token = request.args.get('token') or request.headers.get('X-Cron-Token')
+        if token != secret_token:
+            return jsonify({'error': 'Unauthorized'}), 401
+
+    import threading
+    def run_task():
+        try:
+            print("HTTP Triggered morning fetch and edition refresh...")
+            from live_aggregator import fetch_and_store_morning
+            fetch_and_store_morning()
+        except Exception as e:
+            print(f"Error in triggered morning briefing: {e}")
+
+    threading.Thread(target=run_task).start()
+    return jsonify({'status': 'success', 'message': 'Morning briefing task triggered in background'}), 200
+
+@app.route('/api/tasks/evening-briefing', methods=['GET', 'POST'])
+def trigger_evening_briefing():
+    secret_token = os.environ.get('CRON_SECRET_TOKEN')
+    if secret_token:
+        token = request.args.get('token') or request.headers.get('X-Cron-Token')
+        if token != secret_token:
+            return jsonify({'error': 'Unauthorized'}), 401
+
+    import threading
+    def run_task():
+        try:
+            print("HTTP Triggered evening update and edition add...")
+            from live_aggregator import fetch_and_store_evening
+            fetch_and_store_evening()
+        except Exception as e:
+            print(f"Error in triggered evening briefing: {e}")
+
+    threading.Thread(target=run_task).start()
+    return jsonify({'status': 'success', 'message': 'Evening briefing task triggered in background'}), 200
 
 @app.route('/api/trigger_email')
 def trigger_email():

@@ -842,11 +842,10 @@ def fetch_and_store_morning():
     conn.commit()
     conn.close()
     
-    try:
-        from send_daily_alpha import send_email
-        send_email()
-    except Exception as e:
-        print(f"Error sending morning email: {e}")
+    from send_daily_alpha import send_email
+    success = send_email()
+    if not success:
+        raise Exception("SMTP email sending failed. Check SENDER_EMAIL, SENDER_APP_PASSWORD, and limits.")
 
 
 def fetch_and_store_evening():
@@ -883,11 +882,10 @@ def fetch_and_store_evening():
     conn.close()
     
     if evening_story_ids:
-        try:
-            from send_daily_alpha import send_evening_email
-            send_evening_email()
-        except Exception as e:
-            print(f"Error sending evening email: {e}")
+        from send_daily_alpha import send_evening_email
+        success = send_evening_email()
+        if not success:
+            raise Exception("SMTP email sending failed. Check SENDER_EMAIL, SENDER_APP_PASSWORD, and limits.")
     else:
         print("No new evening stories found. Skipping evening email.")
 

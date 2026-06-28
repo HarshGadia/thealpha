@@ -357,6 +357,16 @@ def trigger_morning_briefing():
         if token != secret_token:
             return jsonify({'error': 'Unauthorized'}), 401
 
+    sync = request.args.get('sync') == 'true'
+    if sync:
+        try:
+            print("HTTP Synchronously triggering morning fetch and edition refresh...")
+            from live_aggregator import fetch_and_store_morning
+            fetch_and_store_morning()
+            return jsonify({'status': 'success', 'message': 'Morning briefing completed successfully'}), 200
+        except Exception as e:
+            return jsonify({'status': 'error', 'message': str(e)}), 500
+
     import threading
     def run_task():
         try:
@@ -376,6 +386,16 @@ def trigger_evening_briefing():
         token = request.args.get('token') or request.headers.get('X-Cron-Token')
         if token != secret_token:
             return jsonify({'error': 'Unauthorized'}), 401
+
+    sync = request.args.get('sync') == 'true'
+    if sync:
+        try:
+            print("HTTP Synchronously triggering evening update and edition add...")
+            from live_aggregator import fetch_and_store_evening
+            fetch_and_store_evening()
+            return jsonify({'status': 'success', 'message': 'Evening briefing completed successfully'}), 200
+        except Exception as e:
+            return jsonify({'status': 'error', 'message': str(e)}), 500
 
     import threading
     def run_task():

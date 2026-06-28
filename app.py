@@ -366,6 +366,7 @@ def trigger_morning_briefing():
             return jsonify({
                 'status': 'success', 
                 'message': 'Morning briefing completed successfully',
+                'sender_used': os.environ.get('SENDER_EMAIL'),
                 'recipients': recipients
             }), 200
         except Exception as e:

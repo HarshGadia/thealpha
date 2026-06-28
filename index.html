@@ -923,32 +923,97 @@
         </div>`;
             }
 
-            // Chronological order is handled directly by the API response
-            const sorted = stories;
             const isDealsTab = tabConfig.id === 'ib-transactions';
-
             let html = `<div class="tab-content" id="tab-${tabConfig.id}">`;
 
-            // Render Lead Story (First item)
-            if (sorted.length > 0) {
-                html += isDealsTab
-                    ? renderDealCard(sorted[0], true, isSavedTab)
-                    : renderStoryCard(sorted[0], true, isSavedTab);
-            }
-
-            // Render Grid Stories (Remaining items - rendering all stories without frontend slice)
-            if (sorted.length > 1) {
-                html += `<div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-gray-200 border border-gray-200">`;
-                const gridItems = sorted.slice(1);
-                const displayItems = gridItems; // render all stories returned by the backend
-                for (let i = 0; i < displayItems.length; i++) {
-                    html += `<div class="bg-white">`;
+            if (isSavedTab) {
+                // Render Saved Tab normally without separation
+                const sorted = stories;
+                if (sorted.length > 0) {
                     html += isDealsTab
-                        ? renderDealCard(displayItems[i], false, isSavedTab)
-                        : renderStoryCard(displayItems[i], false, isSavedTab);
+                        ? renderDealCard(sorted[0], true, isSavedTab)
+                        : renderStoryCard(sorted[0], true, isSavedTab);
+                }
+                if (sorted.length > 1) {
+                    html += `<div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-gray-200 border border-gray-200">`;
+                    const gridItems = sorted.slice(1);
+                    for (let i = 0; i < gridItems.length; i++) {
+                        html += `<div class="bg-white">`;
+                        html += isDealsTab
+                            ? renderDealCard(gridItems[i], false, isSavedTab)
+                            : renderStoryCard(gridItems[i], false, isSavedTab);
+                        html += `</div>`;
+                    }
                     html += `</div>`;
                 }
-                html += `</div>`;
+            } else {
+                // Separate evening (Also, The News) and morning (Morning Intelligence)
+                const eveningStories = stories.filter(s => s.is_evening_update).slice(0, 4);
+                const morningStories = stories.filter(s => !s.is_evening_update).slice(0, 10);
+
+                // 1. Render "Also, The News" Section (at the top)
+                if (eveningStories.length > 0) {
+                    html += `
+                    <div class="mb-10">
+                        <div class="mb-6 flex items-center justify-between border-b border-red-200 pb-2">
+                            <h2 class="font-serif text-xl font-bold uppercase text-red-600 tracking-tight flex items-center gap-2">
+                                <span>Also, The News</span>
+                                <span class="font-mono text-[9px] bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 tracking-widest font-bold uppercase animate-pulse">LATE UPDATE</span>
+                            </h2>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-gray-200 border border-gray-200">
+                    `;
+                    for (let i = 0; i < eveningStories.length; i++) {
+                        html += `<div class="bg-white">`;
+                        html += isDealsTab
+                            ? renderDealCard(eveningStories[i], false, isSavedTab)
+                            : renderStoryCard(eveningStories[i], false, isSavedTab);
+                        html += `</div>`;
+                    }
+                    html += `
+                        </div>
+                    </div>
+                    `;
+                }
+
+                // 2. Render "Morning Intelligence" Section (at the bottom)
+                if (morningStories.length > 0) {
+                    // Show Morning Intelligence header only if there is an evening update section visible
+                    if (eveningStories.length > 0) {
+                        html += `
+                        <div class="mb-6 flex items-center justify-between border-b border-gray-200 pb-2">
+                            <h2 class="font-serif text-xl font-bold uppercase text-gray-900 tracking-tight">
+                                Morning Intelligence
+                            </h2>
+                        </div>
+                        `;
+                    }
+
+                    // Render Morning Lead Story
+                    html += isDealsTab
+                        ? renderDealCard(morningStories[0], true, isSavedTab)
+                        : renderStoryCard(morningStories[0], true, isSavedTab);
+
+                    // Render Morning Grid Stories
+                    if (morningStories.length > 1) {
+                        html += `<div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-gray-200 border border-gray-200">`;
+                        const gridItems = morningStories.slice(1);
+                        for (let i = 0; i < gridItems.length; i++) {
+                            html += `<div class="bg-white">`;
+                            html += isDealsTab
+                                ? renderDealCard(gridItems[i], false, isSavedTab)
+                                : renderStoryCard(gridItems[i], false, isSavedTab);
+                            html += `</div>`;
+                        }
+                        html += `</div>`;
+                    }
+                } else if (eveningStories.length === 0) {
+                    html += `<div class="text-center py-20 bg-alpha-cream border border-dashed border-gray-300">
+                        <span class="material-symbols-outlined text-gray-300 text-4xl mb-3">article</span>
+                        <p class="font-mono text-[11px] text-gray-500 uppercase tracking-widest font-bold">No intelligence available</p>
+                        <p class="font-sans text-[13px] text-gray-400 mt-2">There are currently no stories indexed for ${tabConfig.label}.</p>
+                    </div>`;
+                }
             }
 
             html += `</div>`;

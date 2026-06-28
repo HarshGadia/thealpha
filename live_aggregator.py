@@ -455,6 +455,53 @@ def parse_entry_date(entry):
     return dt
 
 
+def cache_exchange_rate():
+    """Fetch the latest USD/INR rate from the Exchange Rate API and store it in alpha.db."""
+    import urllib.request
+    import json
+    
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS market_rates (
+            symbol TEXT PRIMARY KEY,
+            price REAL,
+            prev REAL,
+            open REAL,
+            updated_at TIMESTAMP
+        )
+    """)
+    try:
+        req = urllib.request.Request("https://open.er-api.com/v6/latest/USD", headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=5) as response:
+            data = json.loads(response.read().decode())
+            rates = data.get('rates', {})
+            inr_rate = rates.get('INR')
+            if inr_rate:
+                prev_rate = inr_rate
+                try:
+                    # Fetch previous close from Yahoo to show the daily percentage change
+                    url = "https://query1.finance.yahoo.com/v8/finance/chart/USDINR%3DX?interval=1m&range=1d"
+                    yf_req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                    with urllib.request.urlopen(yf_req, timeout=2) as yf_resp:
+                        yf_data = json.loads(yf_resp.read().decode())
+                        meta = yf_data.get('chart', {}).get('result', [{}])[0].get('meta', {})
+                        if meta.get('previousClose'):
+                            prev_rate = meta.get('previousClose')
+                except Exception:
+                    pass
+                cursor.execute("""
+                    INSERT OR REPLACE INTO market_rates (symbol, price, prev, open, updated_at) 
+                    VALUES ('USDINR=X', ?, ?, ?, datetime('now'))
+                """, (inr_rate, prev_rate, prev_rate))
+                conn.commit()
+                print(f"Cached USD/INR Exchange Rate: {inr_rate} (previous close: {prev_rate})")
+    except Exception as e:
+        print(f"Failed to cache exchange rate: {e}")
+    finally:
+        conn.close()
+
+
 def fetch_and_store():
     conn = sqlite3.connect(DB_FILE)
     conn.execute('PRAGMA journal_mode=WAL;')
@@ -595,6 +642,11 @@ def fetch_and_store():
 
     conn.close()
 
+    try:
+        cache_exchange_rate()
+    except Exception as e:
+        print(f"Error caching exchange rate: {e}")
+
     ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print(f"\n[{ts}] Aggregation complete — {new_stories_count} new stories added, {error_count} feed errors.\n")
 
@@ -608,31 +660,30 @@ def ensure_edition_stories_populated():
     cursor.execute("SELECT COUNT(*) FROM edition_stories e JOIN stories s ON e.story_id = s.id")
     count = cursor.fetchone()[0]
     
-    if count < 10:
+    if count < 5:
         print("edition_stories table is empty or stale. Initializing/rebuilding now...")
         cursor.execute("DELETE FROM edition_stories")
-        # Populate morning edition with top 12 stories per category
+        # Populate morning edition with top 10 stories per category
         cursor.execute("SELECT DISTINCT category FROM stories")
         categories = [r[0] for r in cursor.fetchall()]
         
         for cat in categories:
-            cursor.execute("SELECT id FROM stories WHERE category = ? ORDER BY lead DESC, time DESC LIMIT 12", (cat,))
+            cursor.execute("SELECT id FROM stories WHERE category = ? ORDER BY lead DESC, time DESC LIMIT 10", (cat,))
             story_ids = [r[0] for r in cursor.fetchall()]
             for sid in story_ids:
                 cursor.execute("INSERT OR REPLACE INTO edition_stories (story_id, edition, category) VALUES (?, 'morning', ?)", (sid, cat))
                 
-        # Also populate evening edition if current time is past 5:00 PM (17:00) IST
+        # Also populate evening edition if current time is past 6:00 PM (18:00) IST
         now_ist = datetime.now(timezone(timedelta(hours=5, minutes=30)))
-        if now_ist.hour >= 17:
-            cutoff_ist = now_ist.replace(hour=11, minute=0, second=0, microsecond=0)
-            cutoff_utc = cutoff_ist.astimezone(timezone.utc)
+        if now_ist.hour >= 18:
+            cutoff_utc = (now_ist - timedelta(hours=24)).astimezone(timezone.utc)
             cutoff_str = cutoff_utc.isoformat()
             
             for cat in categories:
                 cursor.execute("""
                     SELECT id FROM stories 
                     WHERE category = ? AND time >= ? 
-                      AND id NOT IN (SELECT story_id FROM edition_stories)
+                      AND id NOT IN (SELECT story_id FROM edition_stories WHERE edition = 'morning')
                     ORDER BY lead DESC, time DESC 
                     LIMIT 4
                 """, (cat, cutoff_str))
@@ -645,7 +696,7 @@ def ensure_edition_stories_populated():
 
 
 def fetch_and_store_morning():
-    print("Running morning fetch and edition refresh at 7:30 AM IST...")
+    print("Running morning fetch and edition refresh at 8:00 AM IST...")
     fetch_and_store()
     
     conn = sqlite3.connect(DB_FILE)
@@ -657,7 +708,7 @@ def fetch_and_store_morning():
     categories = [r[0] for r in cursor.fetchall()]
     
     for cat in categories:
-        cursor.execute("SELECT id FROM stories WHERE category = ? ORDER BY lead DESC, time DESC LIMIT 12", (cat,))
+        cursor.execute("SELECT id FROM stories WHERE category = ? ORDER BY lead DESC, time DESC LIMIT 10", (cat,))
         story_ids = [r[0] for r in cursor.fetchall()]
         for sid in story_ids:
             cursor.execute("INSERT OR REPLACE INTO edition_stories (story_id, edition, category) VALUES (?, 'morning', ?)", (sid, cat))
@@ -673,7 +724,7 @@ def fetch_and_store_morning():
 
 
 def fetch_and_store_evening():
-    print("Running evening update and edition add at 5:00 PM IST...")
+    print("Running evening update and edition add at 6:00 PM IST...")
     fetch_and_store()
     
     conn = sqlite3.connect(DB_FILE)
@@ -681,8 +732,7 @@ def fetch_and_store_evening():
     cursor.execute("CREATE TABLE IF NOT EXISTS edition_stories (story_id INTEGER PRIMARY KEY, edition TEXT, category TEXT)")
     
     now_ist = datetime.now(timezone(timedelta(hours=5, minutes=30)))
-    cutoff_ist = now_ist.replace(hour=11, minute=0, second=0, microsecond=0)
-    cutoff_utc = cutoff_ist.astimezone(timezone.utc)
+    cutoff_utc = (now_ist - timedelta(hours=24)).astimezone(timezone.utc)
     cutoff_str = cutoff_utc.isoformat()
     
     cursor.execute("SELECT DISTINCT category FROM stories")
@@ -694,7 +744,7 @@ def fetch_and_store_evening():
         cursor.execute("""
             SELECT id FROM stories 
             WHERE category = ? AND time >= ? 
-              AND id NOT IN (SELECT story_id FROM edition_stories)
+              AND id NOT IN (SELECT story_id FROM edition_stories WHERE edition = 'morning')
             ORDER BY lead DESC, time DESC 
             LIMIT 4
         """, (cat, cutoff_str))

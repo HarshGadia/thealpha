@@ -123,9 +123,9 @@ def api_stories():
     IST = dt_timezone(dt_timedelta(hours=5, minutes=30))
     now_ist = datetime.now(IST)
     
-    # If the current time is 5:00 PM (17:00) IST or later, show both morning and evening editions.
+    # If the current time is 6:00 PM (18:00) IST or later, show both morning and evening editions.
     # Otherwise, show only morning.
-    if now_ist.hour >= 17:
+    if now_ist.hour >= 18:
         cursor.execute('''
             SELECT s.*, e.edition FROM stories s
             JOIN edition_stories e ON s.id = e.story_id
@@ -219,6 +219,29 @@ def api_market_data():
         return jsonify({'error': 'No symbol provided'}), 400
     
     if symbol == 'USDINR=X':
+        try:
+            # Query the SQLite market_rates cache table
+            conn = sqlite3.connect(ALPHA_DB)
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT price, prev, open, updated_at 
+                FROM market_rates 
+                WHERE symbol = ?
+            """, (symbol,))
+            row = cursor.fetchone()
+            conn.close()
+            
+            if row:
+                price, prev, open_val, updated_at = row
+                print(f"Serving cached exchange rate for {symbol}: {price} (updated at {updated_at})")
+                return jsonify({
+                    'price': price,
+                    'prev': prev,
+                    'open': open_val
+                })
+        except Exception as e:
+            print(f"Error querying market_rates cache: {e}")
+
         try:
             req = urllib.request.Request("https://open.er-api.com/v6/latest/USD", headers={'User-Agent': 'Mozilla/5.0'})
             with urllib.request.urlopen(req, timeout=5) as response:
